@@ -1,6 +1,9 @@
 export interface BaseCrudContext {
   id?: number;
   entity?: any;
-  createDto?: any;
-  updateDto?: any;
+  dto?: any;
+  params?: any;
+  query?: any;
+  options?: any;
+  result?: any;
 }

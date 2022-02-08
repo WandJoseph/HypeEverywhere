@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { validationOptions } from './utils/validator/validation-options';
 
 const swaggerConfig = (app: INestApplication) => {
   const config = new DocumentBuilder()
@@ -12,13 +13,11 @@ const swaggerConfig = (app: INestApplication) => {
   SwaggerModule.setup('api', app, document);
 };
 
+const validatorConfig = (app: INestApplication) => {
+  app.useGlobalPipes(new ValidationPipe(validationOptions));
+};
 export const appConfig = (app: INestApplication) => {
   swaggerConfig(app);
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-    }),
-  );
+  validatorConfig(app);
   return app;
 };
