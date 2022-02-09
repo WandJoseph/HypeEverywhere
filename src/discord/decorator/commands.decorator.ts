@@ -1,6 +1,6 @@
 import { DiscordModule } from '../discord.module';
 
-export type ParameterType = 'message' | 'channel' | 'author';
+export type ParameterType = 'message' | 'channel' | 'author' | 'args';
 
 const parametersMetadataKey = Symbol('discord.commands:parameters');
 const commandOptionsMetadataKey = Symbol('discord.commands:commands-options');
@@ -105,10 +105,11 @@ export function DiscordController() {
 }
 
 export const Command =
-  (options: CommandOptions) => (target: any, propertyKey: string | symbol) => {
+  (options: CommandOptions) => (target: any, propertyKey: string) => {
     const handler = new CommandDecoratorHandler(target);
-    handler.setCommandOptions(options, propertyKey as string);
-    handler.addCommands(propertyKey as string);
+    options.name = options.name.toLowerCase();
+    handler.setCommandOptions(options, propertyKey);
+    handler.addCommands(propertyKey);
     return target;
   };
 
@@ -129,6 +130,13 @@ export const Author =
 export const Channel =
   () => (target: any, propertyKey: string | symbol, index: number) => {
     const type: ParameterType = 'channel';
+    const handler = new CommandDecoratorHandler(target);
+    handler.addCommandParameter(index, type, propertyKey);
+  };
+
+export const Args =
+  () => (target: any, propertyKey: string | symbol, index: number) => {
+    const type: ParameterType = 'args';
     const handler = new CommandDecoratorHandler(target);
     handler.addCommandParameter(index, type, propertyKey);
   };

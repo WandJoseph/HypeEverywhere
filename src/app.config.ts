@@ -49,7 +49,7 @@ const discordConfig = async () => {
     });
     client.on('messageCreate', async (msg) => {
       if (msg.author.bot) return;
-      const command = msg.content.split(' ')[0];
+      const command = msg.content.split(' ')[0].toLowerCase();
       if (commands[command]) {
         const [options, parameters, key] = commands[command];
         const args = [];
@@ -62,6 +62,10 @@ const discordConfig = async () => {
           }
           if (parameter.type === 'channel') {
             args[parameter.index] = msg.channel;
+          }
+          if (parameter.type === 'args') {
+            const argsList = msg.content.split(' ').slice(1);
+            args[parameter.index] = argsList;
           }
         }
         try {

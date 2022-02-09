@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { TextChannel, User } from 'discord.js';
-import { Author, Channel, Command, DiscordController } from '~/discord';
+import { Args, Author, Channel, Command, DiscordController } from '~/discord';
 import { DiscordCrudContext } from '~/utils/crud/discord-crud.context.interface';
 import { UserDiscordService } from './user-discord.service';
 
@@ -24,6 +24,7 @@ export class UserDiscordController {
     await this.service.create(ctx);
     await msg.edit(`${author.username} Você se cadastrou com sucesso!`);
   }
+
   @Command({
     name: 'vida',
     aliases: ['hp'],
@@ -36,6 +37,27 @@ export class UserDiscordController {
       author,
     };
     const user = await this.service.findOne(ctx);
-    await msg.edit(`${author} Sua vida é ${user.vida}`);
+    await msg.edit(`${author} Sua vida é ${user.health}/${user.maxHealth}`);
+  }
+  @Command({
+    name: 'setVida',
+    aliases: ['hp'],
+    description: 'Vida do Personagem',
+  })
+  async setVida(
+    @Author() author: User,
+    @Channel() channel: TextChannel,
+    @Args() args: string[],
+  ) {
+    const msg = await channel.send(`Setando sua vida ${args}`);
+    const ctx: DiscordCrudContext = {
+      id: author.id,
+      author,
+      dto: {
+        maxHealth: +args[0],
+      },
+    };
+    const user = await this.service.update(ctx);
+    await msg.edit(`${author} vida alterada!`);
   }
 }
