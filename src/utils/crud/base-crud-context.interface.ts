@@ -1,5 +1,5 @@
 export interface BaseCrudContext {
-  id?: number;
+  id?: number | string;
   entity?: any;
   dto?: any;
   params?: any;

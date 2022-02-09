@@ -1,18 +1,23 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module, ConsoleLogger } from '@nestjs/common';
 import { Client, Intents } from 'discord.js';
 import { DiscordOptions } from './discord-options.interface';
 
-@Module({})
+@Global()
+@Module({
+  providers: [ConsoleLogger],
+})
 export class DiscordModule {
-  static forRoot(options: DiscordOptions): DynamicModule {
+  static client: Client;
+  static async forRoot(options: DiscordOptions): Promise<DynamicModule> {
     const client = new Client({
       intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
     });
-
     client.on('ready', () => {
       console.log(`Logged in as ${client.user.tag}!`);
     });
-    client.login(options.token);
+    await client.login(options.token);
+
+    DiscordModule.client = client;
     return {
       module: DiscordModule,
       providers: [
@@ -25,3 +30,7 @@ export class DiscordModule {
     };
   }
 }
+
+export const getClient = () => {
+  return DiscordModule.client;
+};
