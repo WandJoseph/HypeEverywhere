@@ -6,5 +6,11 @@ export class User {
   id: string;
 
   @Column({ default: 0 })
-  vida: number;
+  health: number;
+
+  @Column({ name: 'max_health', default: 0 })
+  maxHealth: number;
+
+  @Column({ default: [] })
+  conditions: string;
 }
