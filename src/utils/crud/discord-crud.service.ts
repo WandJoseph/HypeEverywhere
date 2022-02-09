@@ -12,7 +12,7 @@ export class DiscordCrudService<Entity> extends BaseCrudService<Entity> {
     super(__repo);
   }
   async findOneOrFail(ctx?: DiscordCrudContext): Promise<Entity | undefined> {
-    ctx = await this.baseExecution(ctx, 'findOne');
+    ctx = await this.baseFindOne(ctx);
     if (!ctx.entity) {
       throw new EntityNotFoundException(
         ctx,
@@ -25,7 +25,7 @@ export class DiscordCrudService<Entity> extends BaseCrudService<Entity> {
     ctx?: DiscordCrudContext,
     message?: string,
   ): Promise<Entity | undefined> {
-    ctx = await this.baseExecution(ctx, 'findOne');
+    ctx = await this.baseFindOne(ctx);
     if (ctx.entity) {
       throw new EntityFoundException(
         ctx,

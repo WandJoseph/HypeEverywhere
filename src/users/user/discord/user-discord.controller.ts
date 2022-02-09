@@ -30,7 +30,12 @@ export class UserDiscordController {
     description: 'Vida do Personagem',
   })
   async getVida(@Author() author: User, @Channel() channel: TextChannel) {
-    // const user = await this.service.findOneOrFail(author.id);
-    // await channel.send(`${author.username} Sua vida é ${user.vida}`);
+    const msg = await channel.send('Verificando sua vida!');
+    const ctx: DiscordCrudContext = {
+      id: author.id,
+      author,
+    };
+    const user = await this.service.findOne(ctx);
+    await msg.edit(`${author} Sua vida é ${user.vida}`);
   }
 }

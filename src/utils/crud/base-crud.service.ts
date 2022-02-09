@@ -6,20 +6,22 @@ import { DeleteResult, FindOneOptions, ObjectID, UpdateResult } from 'typeorm';
 import { FindAllQuery, FindAllResult } from './dto/find-all.dto';
 import {
   BaseCrudMetadataHandler,
+  CrudMethods,
   MethodKeys,
 } from './decorators/base-crud.decorator';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 export default abstract class BaseCrudService<Entity> {
   private metadataHandler: BaseCrudMetadataHandler;
+  private beforeMethods: CrudMethods;
+  private afterMethods: CrudMethods;
   private __entityName: string;
-  constructor(protected readonly __repo: Repository<Entity>) {}
-  get metadata() {
-    if (!this.metadataHandler) {
-      this.metadataHandler = new BaseCrudMetadataHandler(this);
-    }
-    return this.metadataHandler;
+  constructor(protected readonly __repo: Repository<Entity>) {
+    this.metadataHandler = new BaseCrudMetadataHandler(this);
+    this.beforeMethods = this.metadataHandler.getAllBeforeMethods();
+    this.afterMethods = this.metadataHandler.getAllBeforeMethods();
   }
+
   protected set entityName(name: string) {
     this.__entityName = name;
   }
@@ -41,17 +43,17 @@ export default abstract class BaseCrudService<Entity> {
     methodKey: MethodKeys,
     ctx: BaseCrudContext,
   ): Promise<BaseCrudContext> {
-    const methods = this.metadata.getBeforeMethods(methodKey);
+    const methods = this.beforeMethods[methodKey];
     for (const method of methods) {
       ctx = (await this[method](ctx)) || ctx;
     }
     return ctx;
   }
   protected async baseAfter(
-    method: MethodKeys,
+    methodKey: MethodKeys,
     ctx: BaseCrudContext,
   ): Promise<BaseCrudContext> {
-    const methods = this.metadata.getAfterMethods(method);
+    const methods = this.afterMethods[methodKey];
     for (const method of methods) {
       ctx = (await this[method](ctx)) || ctx;
     }
@@ -103,7 +105,6 @@ export default abstract class BaseCrudService<Entity> {
   };
   async baseExecution(ctx: BaseCrudContext, method: MethodKeys) {
     ctx = await this.baseBefore(method, ctx);
-
     ctx = await this[this.baseMethods[method]](ctx);
     ctx = await this.baseAfter(method, ctx);
     return ctx;

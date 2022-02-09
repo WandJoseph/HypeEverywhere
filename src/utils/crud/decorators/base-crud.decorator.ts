@@ -16,7 +16,7 @@ export type CrudMethods = {
 export class BaseCrudMetadataHandler {
   constructor(private readonly t: any) {}
 
-  private getAllBeforeMethods(): CrudMethods {
+  getAllBeforeMethods(): CrudMethods {
     const methods = Reflect.getMetadata(BASE_CRUD_BEFORE_METHODS, this.t) || {
       create: [],
       update: [],
@@ -29,7 +29,7 @@ export class BaseCrudMetadataHandler {
   private setAllBeforeMethods(crudMethods: CrudMethods): void {
     Reflect.defineMetadata(BASE_CRUD_BEFORE_METHODS, crudMethods, this.t);
   }
-  private getAllAfterMethods(): CrudMethods {
+  getAllAfterMethods(): CrudMethods {
     const methods = Reflect.getMetadata(BASE_CRUD_AFTER_METHODS, this.t) || {
       create: [],
       update: [],
