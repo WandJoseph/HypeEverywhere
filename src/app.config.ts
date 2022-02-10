@@ -72,6 +72,11 @@ const discordConfig = async () => {
           await controller[key](...args);
         } catch (error) {
           const ctx: DiscordCrudContext = error.ctx;
+          if (!ctx) {
+            const formatedResponse = `${msg.author}, ${error.message}`;
+            await msg.channel.send(formatedResponse);
+            return;
+          }
           const type = error.error;
           const message = error.message;
           const responseAuthor = ctx.author || msg.author;
