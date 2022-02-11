@@ -6,12 +6,12 @@ import {
   TextChannel,
   User,
 } from 'discord.js';
+import { DiscordController } from '~/discord';
 import {
   Args,
   Author,
   Channel,
   Command,
-  DiscordController,
 } from '~/discord/decorator/commands.decorator';
 import { DicesDiscordService } from './dices-discord.service';
 

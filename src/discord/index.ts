@@ -1,2 +1,2 @@
 export * from './decorator/commands.decorator';
-export * from './discord.module';
+export * from './decorator/discord-controller.decorator';

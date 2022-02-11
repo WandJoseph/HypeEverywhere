@@ -1,11 +1,8 @@
-import { DiscordModule } from '../discord.module';
-
 export type ParameterType = 'message' | 'channel' | 'author' | 'args';
 
 const parametersMetadataKey = Symbol('discord.commands:parameters');
 const commandOptionsMetadataKey = Symbol('discord.commands:commands-options');
 const commandsMetadataKey = Symbol('discord.commands:commands');
-
 export interface CommandOptions {
   name: string;
   description: string;
@@ -18,7 +15,7 @@ export interface Parameter {
   type: ParameterType;
   propertyKey?: string | symbol;
 }
-export class CommandDecoratorHandler {
+export class DiscordCommandMetadataHandler {
   constructor(private readonly target: any) {}
 
   getCommands(): string[] {
@@ -81,32 +78,9 @@ export class CommandDecoratorHandler {
   }
 }
 
-export function DiscordController() {
-  return function _DiscordController<T extends { new (...args: any[]): {} }>(
-    constr: T,
-  ) {
-    return class extends constr {
-      constructor(...args: any[]) {
-        super(...args);
-        const controllers =
-          Reflect.getMetadata(
-            'discord.controllers:controllers',
-            DiscordModule,
-          ) || [];
-        controllers.push(this);
-        Reflect.defineMetadata(
-          'discord.controllers:controllers',
-          controllers,
-          DiscordModule,
-        );
-      }
-    };
-  };
-}
-
 export const Command =
   (options: CommandOptions) => (target: any, propertyKey: string) => {
-    const handler = new CommandDecoratorHandler(target);
+    const handler = new DiscordCommandMetadataHandler(target);
     options.name = options.name.toLowerCase();
     handler.setCommandOptions(options, propertyKey);
     handler.addCommands(propertyKey);
@@ -116,27 +90,27 @@ export const Command =
 export const Msg =
   () => (target: any, propertyKey: string | symbol, index: number) => {
     const type: ParameterType = 'message';
-    const handler = new CommandDecoratorHandler(target);
+    const handler = new DiscordCommandMetadataHandler(target);
     handler.addCommandParameter(index, type, propertyKey);
   };
 
 export const Author =
   () => (target: any, propertyKey: string | symbol, index: number) => {
     const type: ParameterType = 'author';
-    const handler = new CommandDecoratorHandler(target);
+    const handler = new DiscordCommandMetadataHandler(target);
     handler.addCommandParameter(index, type, propertyKey);
   };
 
 export const Channel =
   () => (target: any, propertyKey: string | symbol, index: number) => {
     const type: ParameterType = 'channel';
-    const handler = new CommandDecoratorHandler(target);
+    const handler = new DiscordCommandMetadataHandler(target);
     handler.addCommandParameter(index, type, propertyKey);
   };
 
 export const Args =
   () => (target: any, propertyKey: string | symbol, index: number) => {
     const type: ParameterType = 'args';
-    const handler = new CommandDecoratorHandler(target);
+    const handler = new DiscordCommandMetadataHandler(target);
     handler.addCommandParameter(index, type, propertyKey);
   };

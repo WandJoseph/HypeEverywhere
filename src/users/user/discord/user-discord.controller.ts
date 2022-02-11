@@ -4,7 +4,9 @@ import { Args, Author, Channel, Command, DiscordController } from '~/discord';
 import { DiscordCrudContext } from '~/utils/crud/discord-crud.context.interface';
 import { UserDiscordService } from './user-discord.service';
 
-@DiscordController()
+@DiscordController({
+  collection: 'user',
+})
 @Controller()
 export class UserDiscordController {
   constructor(private readonly service: UserDiscordService) {}
