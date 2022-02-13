@@ -19,7 +19,7 @@ export default abstract class BaseCrudService<Entity> {
   constructor(protected readonly __repo: Repository<Entity>) {
     this.metadataHandler = new BaseCrudMetadataHandler(this);
     this.beforeMethods = this.metadataHandler.getAllBeforeMethods();
-    this.afterMethods = this.metadataHandler.getAllBeforeMethods();
+    this.afterMethods = this.metadataHandler.getAllAfterMethods();
   }
 
   protected set entityName(name: string) {
@@ -82,7 +82,7 @@ export default abstract class BaseCrudService<Entity> {
     return ctx;
   }
   protected async baseFindAll(ctx: BaseCrudContext) {
-    const query: FindAllQuery = ctx.query;
+    const query: FindAllQuery = ctx.query || {};
     const take = query.take || 10;
     const skip = query.skip || 0;
     const [data, count] = await this.__repo.findAndCount({

@@ -1,7 +1,7 @@
 import { applyDecorators, Delete } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { BadRequestResponse } from '~/utils/validator/bad-request-response';
-import { EntityDeletedResponse } from '~/utils/validator/entity-deleted-response';
+import { BadRequestResponse } from '~/utils/http/bad-request-response';
+import { EntityDeletedResponse } from '~/utils/http/entity-deleted-response';
 
 export interface DeleteRouteOptions {
   path?: string;

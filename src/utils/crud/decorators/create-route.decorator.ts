@@ -1,6 +1,6 @@
 import { applyDecorators, Post } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { BadRequestResponse } from '~/utils/validator/bad-request-response';
+import { BadRequestResponse } from '~/utils/http/bad-request-response';
 
 export interface CreateRouteOptions {
   path?: string;

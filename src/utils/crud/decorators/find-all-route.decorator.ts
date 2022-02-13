@@ -1,6 +1,7 @@
 import { applyDecorators, Get } from '@nestjs/common';
 import { ApiProperty, ApiResponse, PickType } from '@nestjs/swagger';
-import { BadRequestResponse } from '~/utils/validator/bad-request-response';
+import { BadRequestResponse } from '~/utils/http/bad-request-response';
+import { FindAllResponse } from '~/utils/http/find-all-response';
 
 export interface FindAllRouteOptions {
   path?: string;
@@ -15,6 +16,7 @@ export const FindAllRoute = (options?: FindAllRouteOptions) => {
     Get(path),
     ApiResponse({
       status: 200,
+      type: FindAllResponse,
       description: `${entityName} deleted successfully`,
     }),
     ApiResponse({

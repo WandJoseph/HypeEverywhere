@@ -1,7 +1,7 @@
 import { applyDecorators, Patch } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { BadRequestResponse } from '~/utils/validator/bad-request-response';
-import { EntityUpdatedResponse } from '~/utils/validator/entity-updated-response';
+import { BadRequestResponse } from '~/utils/http/bad-request-response';
+import { EntityUpdatedResponse } from '~/utils/http/entity-updated-response';
 
 export interface UpdateRouteOptions {
   path?: string;
