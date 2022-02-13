@@ -78,16 +78,25 @@ export class DiscordEventProvider {
         name: commandName,
         methodKey,
         description: options.description,
-        aliases,
         parameters,
       };
+      for (const alias of aliases) {
+        commands[alias] = {
+          name: commandName,
+          methodKey,
+          description: options.description,
+          parameters,
+        };
+      }
     }
     return commands;
   }
+
   getGuild(guild: DiscordGuild): Guild {
     // Get Guild from database
     return new Guild();
   }
+
   mountArguments(
     parameters: Parameter[],
     options: {
@@ -113,6 +122,7 @@ export class DiscordEventProvider {
     }
     return args;
   }
+
   async onMessageErrorHandler(message: Message, error: any) {
     const ctx: DiscordCrudContext = error?.ctx;
     if (!ctx) {
@@ -145,22 +155,26 @@ export class DiscordEventProvider {
   onMessage() {
     for (const controller of this.controllers) {
       const commands = this.getCommands(controller);
-      const controllerOptions = this.getControllerOptions(controller);
+      const { collection } = this.getControllerOptions(controller);
       this.client.on('messageCreate', async (message) => {
+        // SE FOR UM BOT
         if (message.author.bot) return;
-        if (!message.guild) return; // POR ENQUANTO APENAS GUILD MESSAGES
+        // SE NÃO FOR NA GUILD
+        if (!message.guild) return;
         const guild = this.getGuild(message.guild);
         if (!guild) return;
         const prefix = guild.prefix || '!';
+        // SE NÃO COMEÇAR COM O PREFIXO
         if (!message.content.startsWith(prefix)) return;
+        // REMOVENDO O PREFIXO DO CONTENT
         let messageContent = message.content.slice(prefix.length);
-        const collection = controllerOptions.collection;
+        // COLEÇÃO CHECK UP
         messageContent = collection
           ? this.setupCollection(collection, messageContent)
           : messageContent;
         if (!messageContent) return;
         const command = messageContent.split(' ')[0].toLowerCase();
-        const content = messageContent.slice(command.length);
+        const content = messageContent.slice(command.length + 1);
         if (commands[command]) {
           const cmd = commands[command];
           const args = this.mountArguments(cmd.parameters, {
@@ -171,7 +185,6 @@ export class DiscordEventProvider {
             command: command,
             content,
           });
-          // ORGANIZAR ESSA PORRA
           try {
             await controller[cmd.methodKey](...args);
           } catch (error) {
