@@ -25,9 +25,29 @@ const discordConfig = async () => {
 const validatorConfig = (app: INestApplication) => {
   app.useGlobalPipes(new ValidationPipe(validationOptions));
 };
-export const appConfig = async (app: INestApplication) => {
-  swaggerConfig(app);
-  validatorConfig(app);
-  await discordConfig();
+
+interface ConfigModules {
+  swagger?: boolean;
+  validator?: boolean;
+  discord?: boolean;
+}
+
+export const appConfig = async (
+  app: INestApplication,
+  { swagger, validator, discord }: ConfigModules = {
+    swagger: true,
+    validator: true,
+    discord: true,
+  },
+) => {
+  if (swagger) {
+    swaggerConfig(app);
+  }
+  if (validator) {
+    validatorConfig(app);
+  }
+  if (discord) {
+    await discordConfig();
+  }
   return app;
 };

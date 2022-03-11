@@ -10,8 +10,18 @@ import { AttributeDiscordService } from './attribute-discord.service';
 export class AttributeDiscordController {
   constructor(private readonly service: AttributeDiscordService) {}
 
-  @Command({ name: 'findOne', description: 'Criação de um novo Atributo' })
+  @Command({
+    name: 'findOne',
+    description: 'Criação de um novo Atributo',
+    aliases: ['show', 'atb'],
+  })
   findOne() {}
-  @Command({ name: 'findAll', description: 'Criação de um novo Atributo' })
-  findAll() {}
+  @Command({
+    name: 'findAll',
+    aliases: ['oloco'],
+    description: 'Criação de um novo Atributo',
+  })
+  async findAll(@Channel() channel: TextChannel) {
+    await channel.send('Olá bem vindo');
+  }
 }

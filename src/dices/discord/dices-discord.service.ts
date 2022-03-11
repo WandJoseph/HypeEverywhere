@@ -1,6 +1,5 @@
 import { Dice } from '../entities/dice.entitiy';
 import { Roll } from '../entities/roll.entity';
-import { StorytellerRoll } from '../entities/storyteller-roll.entity';
 export class DicesDiscordService {
   isNumber(value: string) {
     return !isNaN(+value);
@@ -17,11 +16,6 @@ export class DicesDiscordService {
 
   roll(...args: string[]) {
     const roll = new Roll(...args);
-    return roll;
-  }
-
-  storytellerRoll(...args: string[]) {
-    const roll = new StorytellerRoll(...args);
     return roll;
   }
 

@@ -1,3 +1,4 @@
+import { CDN } from '@discordjs/rest';
 import { evaluate } from 'mathjs';
 import { Dice } from './dice.entitiy';
 
@@ -5,71 +6,84 @@ export type MathOperator = '+' | '-' | '*' | '/';
 export type LogicOperator = '<' | '>' | '<=' | '>=' | '==' | '!=';
 
 export class Roll {
-  private __rolls: Array<number | Dice | MathOperator> = [];
   public expression: string;
-  public mathExpression: string;
-  public total: number | boolean;
-  isNumber(value: string): boolean {
-    return !isNaN(+value);
-  }
-  isDice(value: string) {
-    const rolls: string[] = value.split('d');
-    if (rolls.length !== 2) return false;
-    if (!this.isNumber(rolls[0]) || !this.isNumber(rolls[1])) return false;
-    return true;
-  }
-  isMathOperator(value: string) {
-    return value === '+' || value === '-' || value === '*' || value === '/';
-  }
+  public rightExpr: string;
+  public rightDiceExpr: string;
+  public rightValues: Array<Dice | string>;
+  public rightTotal: number;
+  public operator: string;
+  public leftExpr: string;
+  public leftDiceExpr: string;
+  public leftValues: Array<Dice | string>;
+  public leftTotal: number;
+  public total: number;
+  public result: boolean;
 
-  isLogicOperator(value: string) {
-    return (
-      value === '<' ||
-      value === '>' ||
-      value === '<=' ||
-      value === '>=' ||
-      value === '==' ||
-      value === '!='
-    );
-  }
-  getMathExpression(rolls: Array<number | Dice | MathOperator>) {
-    return rolls
-      .map((value: number | Dice | MathOperator) => {
-        if (value instanceof Dice) return '+' + value.total;
-        return value;
-      })
-      .join(' ')
-      .replace(/[+][ ][+]/g, '+ ')
-      .replace(/[-][ ][+]/g, '- ');
-  }
-
-  orderRolls(...args: any[]) {
-    for (let i = 0; i < args.length; i++) {
-      const value = args[i];
-      if (this.isNumber(value)) {
-        this.pushRoll(value);
-      } else if (this.isMathOperator(value)) {
-        this.pushRoll(value);
-      } else if (this.isDice(value)) {
-        const dice = new Dice(+value.split('d')[0], +value.split('d')[1]);
-        this.pushRoll(dice);
-      } else if (this.isLogicOperator(value)) {
-        this.pushRoll(value);
-      } else {
-        throw new Error(`Invalid roll: ${value}`);
+  splitByOperator(expression: string): string[] {
+    for (const operator of ['<', '>']) {
+      if (expression.includes(operator)) {
+        const [left, right] = expression.split(operator);
+        this.leftExpr = left;
+        this.rightExpr = right;
+        this.operator = operator + '=';
+        return;
       }
     }
+    this.leftExpr = expression;
+    this.rightExpr = '';
   }
-  pushRoll(value: number | Dice | MathOperator) {
-    this.__rolls.push(value);
+  getTotalFromExpression(expr: string) {
+    const args = expr.split(' ');
+    const rolls: Array<Dice | string> = [];
+    for (const arg of args) {
+      if (Dice.isDice(arg)) {
+        const [faces, quantity] = arg.split('d');
+        rolls.push(new Dice(+faces, +quantity));
+      } else {
+        rolls.push(arg);
+      }
+    }
+    return rolls;
   }
-  defineTotal() {
-    this.expression = this.__rolls.join(' ');
-    this.mathExpression = this.getMathExpression(this.__rolls);
-    this.total = evaluate(this.mathExpression);
+  private getTotal(values: Array<Dice | string>): number {
+    let expr = '';
+    for (const value of values) {
+      if (typeof value === 'string') {
+        expr += value + ' ';
+      } else {
+        expr += value.total + ' ';
+      }
+    }
+    return evaluate(expr);
   }
+  private getDiceExpr(values: Array<Dice | string>): string {
+    let expr = '';
+    for (const value of values) {
+      if (typeof value === 'string') {
+        expr += value + ' ';
+      } else {
+        expr += `${value}`;
+      }
+    }
+    return expr;
+  }
+  defineResult() {
+    if (!this.rightTotal) {
+      this.total = this.leftTotal;
+      return;
+    }
+    this.leftDiceExpr = this.getDiceExpr(this.leftValues);
+    this.rightDiceExpr = this.getDiceExpr(this.rightValues);
+    this.result = evaluate(this.leftTotal + this.operator + this.rightTotal);
+  }
+
   constructor(...args: any[]) {
-    this.orderRolls(...args);
-    this.defineTotal();
+    this.expression = args.join(' ');
+    this.splitByOperator(this.expression);
+    this.leftValues = this.getTotalFromExpression(this.leftExpr);
+    this.rightValues = this.getTotalFromExpression(this.rightExpr);
+    this.leftTotal = this.getTotal(this.leftValues);
+    this.rightTotal = this.getTotal(this.rightValues);
+    this.defineResult();
   }
 }

@@ -33,4 +33,10 @@ export class Dice {
   toString(): string {
     return `${this.quantity}d${this.faces}: [${this.rolls.join(', ')}]`;
   }
+  static isDice(value: string): boolean {
+    const rolls: string[] = value.split('d');
+    if (rolls.length !== 2) return false;
+    if (isNaN(+rolls[0]) || isNaN(+rolls[1])) return false;
+    return true;
+  }
 }

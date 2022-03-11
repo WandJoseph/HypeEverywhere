@@ -28,73 +28,65 @@ export class DicesDiscordController {
   ) {
     const msg = await channel.send('Rolling a dice...');
     const roll = this.service.roll(...args);
-    const totalField: EmbedField =
-      typeof roll.total == 'number'
-        ? { name: `Total: ${roll.total}`, value: '', inline: false }
-        : {
-            name: roll.total ? 'Sucesso!' : 'Falha!',
-            value: '',
-            inline: false,
-          };
-    totalField.value = roll.mathExpression;
-    // const toto
-    const color: ColorResolvable = roll.total ? '#00ff00' : '#ff0000';
+    const color: ColorResolvable = '#ffffff';
     const embed = new MessageEmbed({
       color,
       author: {
         name: author.username,
         icon_url: author.avatarURL(),
       },
-      title: `Rolou ${roll.expression}`,
-      fields: [totalField],
+      title: `${roll.expression}`,
+      description: `${roll.total}`,
     });
     await msg.edit({
-      content: `${author} `,
+      content: `${author}`,
       embeds: [embed],
     });
   }
   @Command({
-    name: 'sroll',
-    description: 'Roll a Storyteller style dice',
-    aliases: ['s'],
+    name: 'wroll',
+    description: 'Automatic insert default dice for Wand Roll',
+    aliases: ['w'],
   })
-  async storytellerRoll(
+  async WandRoll(
     @Author() author: User,
     @Channel() channel: TextChannel,
     @Args() args: string[],
   ) {
     const msg = await channel.send('Rolling a dice...');
-    const roll = this.service.storytellerRoll(...args);
+    args = ['3d10', '<', ...args];
+    const roll = this.service.roll(...args);
+    const color: ColorResolvable = roll.result ? '#00ff00' : '#ff0000';
+    const margin = roll.rightTotal - roll.leftTotal;
 
-    const totalField: EmbedField =
-      typeof roll.total == 'number'
-        ? { name: `Total: ${roll.total}`, value: '', inline: false }
-        : {
-            name: roll.total ? 'Sucesso!' : 'Falha!',
-            value: '',
-            inline: false,
-          };
-    totalField.value = roll.mathExpression;
-    // const toto
-    const color: ColorResolvable = roll.total ? '#00ff00' : '#ff0000';
-    const title =
-      roll.expression.length > 255
-        ? `Total: ${roll.total}`
-        : `Rolou:\n${roll.expression}`;
-    const description =
-      roll.expression.length > 255 ? roll.expression : undefined;
+    const leftField: EmbedField = {
+      name: 'Rolagem',
+      value: `${roll.leftTotal}`,
+      inline: true,
+    };
+
+    const rightField: EmbedField = {
+      name: 'Nível de Habilidade',
+      value: `${roll.rightTotal}`,
+      inline: true,
+    };
+    const totalField: EmbedField = {
+      name: `Margem: ${margin}`,
+      value: `${roll.rightTotal}-${roll.leftTotal} = ${margin}`,
+      inline: false,
+    };
     const embed = new MessageEmbed({
       color,
-      description,
       author: {
         name: author.username,
         icon_url: author.avatarURL(),
       },
-      title,
-      fields: [totalField],
+      description: `${roll.leftDiceExpr}: ${roll.leftTotal} ${roll.operator} ${roll.rightDiceExpr}`,
+      title: roll.result ? 'Sucesso!' : 'Falha!',
+      fields: [leftField, rightField, totalField],
     });
     await msg.edit({
-      content: `${author} `,
+      content: `${author}`,
       embeds: [embed],
     });
   }

@@ -37,7 +37,7 @@ export class AttributeController {
       id: params.id,
       dto,
     };
-    return this.service.create(ctx);
+    return this.service.update(ctx);
   }
   @DeleteRoute({
     type: Attribute,
