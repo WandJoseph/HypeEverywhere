@@ -17,8 +17,4 @@ export class UserDiscordService extends DiscordCrudService<User> {
   async shouldNotExistUser(ctx: DiscordCrudContext) {
     await this.findOneAndFail(ctx, 'você já está registrado :smile:!');
   }
-  @Before('findOne')
-  async shouldExistUser(ctx: DiscordCrudContext) {
-    await this.findOneOrFail(ctx);
-  }
 }

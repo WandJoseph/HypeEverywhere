@@ -82,6 +82,9 @@ export const Command =
   (options: CommandOptions) => (target: any, propertyKey: string) => {
     const handler = new DiscordCommandMetadataHandler(target);
     options.name = options.name.toLowerCase();
+    if (!options?.name) {
+      options.name = 'default';
+    }
     handler.setCommandOptions(options, propertyKey);
     handler.addCommands(propertyKey);
     return target;

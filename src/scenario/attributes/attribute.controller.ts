@@ -1,6 +1,5 @@
 import { Body, Controller, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Command, DiscordController } from '~/discord';
 import {
   BaseCrudContext,
   CreateRoute,

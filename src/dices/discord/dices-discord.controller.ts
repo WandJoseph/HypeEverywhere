@@ -29,14 +29,19 @@ export class DicesDiscordController {
     const msg = await channel.send('Rolling a dice...');
     const roll = this.service.roll(...args);
     const color: ColorResolvable = '#ffffff';
+
     const embed = new MessageEmbed({
       color,
-      author: {
-        name: author.username,
-        icon_url: author.avatarURL(),
-      },
-      title: `${roll.expression}`,
-      description: `${roll.total}`,
+      title: `${roll.originalExpr} = ${
+        roll.total || roll.total === 0
+          ? roll.total
+          : roll.result
+          ? 'Sucesso'
+          : 'Falha'
+      }`,
+      description: `${roll.leftDiceExpr} ${
+        roll.operator ? roll.operator + ' ' : ''
+      }${roll.rightDiceExpr || ''}`,
     });
     await msg.edit({
       content: `${author}`,
@@ -56,16 +61,32 @@ export class DicesDiscordController {
     const msg = await channel.send('Rolling a dice...');
     args = ['3d10', '<', ...args];
     const roll = this.service.roll(...args);
-    const color: ColorResolvable = roll.result ? '#00ff00' : '#ff0000';
     const margin = roll.rightTotal - roll.leftTotal;
+    const criticSuccess = roll.leftTotal <= 5;
+    const criticFail = roll.leftTotal >= 27;
 
-    const leftField: EmbedField = {
+    const color: ColorResolvable = criticSuccess
+      ? '#ffbd33'
+      : criticFail
+      ? '#000000'
+      : roll.result
+      ? '#00ff00'
+      : '#ff0000';
+    const title = criticSuccess
+      ? ' :star: SUCESSSO CRITICO!! :star:'
+      : criticFail
+      ? ' :skull_crossbones: FALHA CRITICA HAHA!! :skull_crossbones:'
+      : roll.result
+      ? 'Sucesso!'
+      : 'Falha!';
+
+    const rollField: EmbedField = {
       name: 'Rolagem',
       value: `${roll.leftTotal}`,
       inline: true,
     };
 
-    const rightField: EmbedField = {
+    const habilityField: EmbedField = {
       name: 'Nível de Habilidade',
       value: `${roll.rightTotal}`,
       inline: true,
@@ -75,16 +96,14 @@ export class DicesDiscordController {
       value: `${roll.rightTotal}-${roll.leftTotal} = ${margin}`,
       inline: false,
     };
+
     const embed = new MessageEmbed({
       color,
-      author: {
-        name: author.username,
-        icon_url: author.avatarURL(),
-      },
-      description: `${roll.leftDiceExpr}: ${roll.leftTotal} ${roll.operator} ${roll.rightDiceExpr}`,
-      title: roll.result ? 'Sucesso!' : 'Falha!',
-      fields: [leftField, rightField, totalField],
+      description: `${roll.leftDiceExpr} ${roll.operator} ${roll.rightDiceExpr}`,
+      title,
+      fields: [rollField, habilityField, totalField],
     });
+
     await msg.edit({
       content: `${author}`,
       embeds: [embed],

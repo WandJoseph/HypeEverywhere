@@ -130,47 +130,4 @@ export default abstract class BaseCrudService<Entity> {
     ctx = await this.baseExecution(ctx, 'findAll');
     return ctx.result;
   }
-
-  // findOneOrFail(
-  //   id?: string | number | Date | ObjectID,
-  //   options?: FindOneOptions<Entity>,
-  //   name?: string,
-  // ): Promise<Entity | undefined>;
-  // findOneOrFail(
-  //   options?: FindOneOptions<Entity>,
-  //   name?: string,
-  // ): Promise<Entity | undefined>;
-  // async findOneOrFail(...args: any[]): Promise<Entity> {
-  //   const [id, options] = args;
-  //   let ctx: BaseCrudContext = { id, options };
-  //   ctx = await this.baseBefore('findOne', ctx);
-  //   ctx = await this.baseFindOne(ctx);
-  //   ctx = await this.baseAfter('findOne', ctx);
-  //   if (!ctx.entity) {
-  //     const entityInfo = this.entityInfo(...args);
-  //     throw new NotFoundException(`${entityInfo} not found`);
-  //   }
-  //   return ctx.entity;
-  // }
-  // findOneAndFail(
-  //   id?: string | number | Date | ObjectID,
-  //   options?: FindOneOptions<Entity>,
-  //   name?: string,
-  // ): Promise<Entity | undefined>;
-  // findOneAndFail(
-  //   options?: FindOneOptions<Entity>,
-  //   name?: string,
-  // ): Promise<Entity | undefined>;
-  // async findOneAndFail(...args: any[]): Promise<Entity> {
-  //   const [id, options] = args;
-  //   let ctx: BaseCrudContext = { id, options };
-  //   ctx = await this.baseBefore('findOne', ctx);
-  //   ctx = await this.baseFindOne(ctx);
-  //   ctx = await this.baseAfter('findOne', ctx);
-  //   if (ctx.entity) {
-  //     const entityInfo = this.entityInfo(...args);
-  //     throw new BadRequestException(`${entityInfo} already exists`);
-  //   }
-  //   return ctx.entity;
-  // }
 }

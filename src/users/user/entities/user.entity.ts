@@ -1,16 +1,33 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+export enum Element {
+  fire = 'fire',
+  water = 'water',
+  earth = 'earth',
+  air = 'air',
+}
+
 @Entity()
 export class User {
   @PrimaryColumn()
   id: string;
 
-  @Column({ default: 0 })
-  health: number;
+  @Column({ nullable: true })
+  name: string;
 
-  @Column({ name: 'max_health', default: 0 })
-  maxHealth: number;
+  @Column('text', { nullable: true })
+  quote: string;
 
-  @Column({ default: [] })
-  conditions: string;
+  @Column({ nullable: true })
+  nationality: string;
+  @Column({ nullable: true })
+  genre: string;
+  @Column({ nullable: true })
+  birthDate: Date;
+  element: Element;
+  @Column('text', { array: true, default: ['english'] })
+  languages: string[];
+
+  @Column({ nullable: true })
+  personality: string;
 }

@@ -4,17 +4,19 @@ export class Dice {
   isRolled: boolean;
   rolls: number[] = [];
   public total: number;
-  constructor(quantity: number, faces: number) {
-    this.quantity = quantity;
+  constructor(faces: number);
+  constructor(quantity: number, faces?: number);
+  constructor(quantity: number, faces?: number) {
+    this.quantity = quantity ? quantity : 1;
     this.faces = faces;
 
-    if (quantity <= 0 || faces <= 0) {
+    if (this.quantity <= 0 || this.faces <= 0) {
       throw new Error(
-        `Dado inválido, é necessário que as faces e a quantidade seja maior que 0, Dado: ${quantity}d${faces}`,
+        `Dado inválido, é necessário que as faces e a quantidade seja maior que 0, Dado: ${this.quantity}d${this.faces}`,
       );
     }
-    if (quantity > 100 && faces > 1000) {
-      throw new Error('Dice cannot be more than 100d1000');
+    if (this.quantity > 100 && this.faces > 1000) {
+      throw new Error('O dado não pode ser maior que 100d1000');
     }
     this.roll();
   }
@@ -27,11 +29,14 @@ export class Dice {
       this.rolls.push(result);
       this.total += result;
     }
+    this.rolls.sort((a, b) => a - b);
     this.isRolled = true;
   }
 
   toString(): string {
-    return `${this.quantity}d${this.faces}: [${this.rolls.join(', ')}]`;
+    return `${this.quantity}d${this.faces}: **${
+      this.total
+    }** [${this.rolls.join(', ')}]`;
   }
   static isDice(value: string): boolean {
     const rolls: string[] = value.split('d');

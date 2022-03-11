@@ -12,12 +12,15 @@ export class DiscordCrudService<Entity> extends BaseCrudService<Entity> {
   constructor(protected readonly __repo: Repository<Entity>) {
     super(__repo);
   }
-  async findOneOrFail(ctx?: DiscordCrudContext): Promise<Entity | undefined> {
+  async findOneOrFail(
+    ctx?: DiscordCrudContext,
+    message?: string,
+  ): Promise<Entity | undefined> {
     ctx = await this.baseFindOne(ctx);
     if (!ctx.entity) {
       throw new EntityNotFoundException(
         ctx,
-        `That ${this.entityName || 'entity'} does not exist`,
+        message || `That ${this.entityName || 'entity'} does not exist`,
       );
     }
     return ctx.entity;

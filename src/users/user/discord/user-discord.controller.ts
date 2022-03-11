@@ -26,40 +26,19 @@ export class UserDiscordController {
     await this.service.create(ctx);
     await msg.edit(`${author.username} Você se cadastrou com sucesso!`);
   }
-
-  @Command({
-    name: 'vida',
-    aliases: ['hp'],
-    description: 'Vida do Personagem',
-  })
-  async getVida(@Author() author: User, @Channel() channel: TextChannel) {
-    const msg = await channel.send('Verificando sua vida!');
+  @Command({ name: 'show', description: 'Registre-se como um usuário' })
+  async show(@Author() author: User, @Channel() channel: TextChannel) {
+    const msg = await channel.send(
+      `${author.username} Verificando seu registro!`,
+    );
     const ctx: DiscordCrudContext = {
       id: author.id,
-      author,
-    };
-    const user = await this.service.findOne(ctx);
-    await msg.edit(`${author} Sua vida é ${user.health}/${user.maxHealth}`);
-  }
-  @Command({
-    name: 'setVida',
-    aliases: ['hp'],
-    description: 'Vida do Personagem',
-  })
-  async setVida(
-    @Author() author: User,
-    @Channel() channel: TextChannel,
-    @Args() args: string[],
-  ) {
-    const msg = await channel.send(`Setando sua vida ${args}`);
-    const ctx: DiscordCrudContext = {
-      id: author.id,
-      author,
+      msg,
       dto: {
-        maxHealth: +args[0],
+        id: author.id,
       },
     };
-    const user = await this.service.update(ctx);
-    await msg.edit(`${author} vida alterada!`);
+    const user = await this.service.findOneOrFail(ctx);
+    await msg.edit(`${JSON.stringify(user, null, 2)}`);
   }
 }

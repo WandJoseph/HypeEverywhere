@@ -144,18 +144,28 @@ export class DiscordEventProvider {
     }
   }
 
-  setupCollection(collection: string, content: string): string | undefined {
-    if (content.startsWith(collection + ' ')) {
-      return content.slice(collection.length + 1);
-    } else {
-      return;
-    }
-  }
-
   onMessage() {
+    const helpCommand: {
+      [key: string]:
+        | {
+            [command: string]: string;
+          }
+        | string;
+    } = {};
     for (const controller of this.controllers) {
       const commands = this.getCommands(controller);
       const { collection } = this.getControllerOptions(controller);
+      if (collection) {
+        helpCommand[collection] = {};
+        for (const command of Object.keys(commands)) {
+          helpCommand[collection][command] = commands[command].description;
+        }
+      } else {
+        for (const command of Object.keys(commands)) {
+          helpCommand[command] = commands[command].description;
+        }
+      }
+
       this.client.on('messageCreate', async (message) => {
         // SE FOR UM BOT
         if (message.author.bot) return;
@@ -168,15 +178,42 @@ export class DiscordEventProvider {
         if (!message.content.startsWith(prefix)) return;
         // REMOVENDO O PREFIXO DO CONTENT
         let messageContent = message.content.slice(prefix.length);
-        // COLEÇÃO CHECK UP
-        messageContent = collection
-          ? this.setupCollection(collection, messageContent)
-          : messageContent;
-        if (!messageContent) return;
+        // COLLECTION
+        if (!collection) {
+          const command = messageContent.split(' ')[0].toLowerCase();
+          if (commands[command]) {
+            const content = messageContent.slice(command.length + 1);
+            const cmd = commands[command];
+            const args = this.mountArguments(cmd.parameters, {
+              args: content.split(' '),
+              message,
+              author: message.author,
+              channel: message.channel as TextChannel,
+              command: command,
+              content,
+            });
+            try {
+              await controller[cmd.methodKey](...args);
+            } catch (error) {
+              await this.onMessageErrorHandler(message, error);
+            }
+          }
+          return;
+        }
+        // SE FOR COLLECTION
+        if (!messageContent.startsWith(collection)) {
+          return;
+        }
+        messageContent = messageContent.slice(collection.length + 1);
         const command = messageContent.split(' ')[0].toLowerCase();
-        const content = messageContent.slice(command.length + 1);
-        if (commands[command]) {
-          const cmd = commands[command];
+        let cmd = commands[command];
+        if (cmd) {
+          messageContent = messageContent.slice(command.length + 1);
+        } else {
+          cmd = commands['default'];
+        }
+        if (cmd) {
+          const content = messageContent;
           const args = this.mountArguments(cmd.parameters, {
             args: content.split(' '),
             message,
@@ -193,6 +230,35 @@ export class DiscordEventProvider {
         }
       });
     }
+    this.client.on('messageCreate', async (message) => {
+      // SE FOR UM BOT
+      if (message.author.bot) return;
+      // SE NÃO FOR NA GUILD
+      if (!message.guild) return;
+      const guild = this.getGuild(message.guild);
+      if (!guild) return;
+      const prefix = guild.prefix || '!';
+      // SE NÃO COMEÇAR COM O PREFIXO
+      if (!message.content.startsWith(prefix)) return;
+      // REMOVENDO O PREFIXO DO CONTENT
+      const content = message.content.slice(prefix.length);
+      if (content.startsWith('help')) {
+        let helpMessage = `${message.author}\n`;
+        for (const key of Object.keys(helpCommand)) {
+          if (typeof helpCommand[key] === 'string') {
+            helpMessage += `**${prefix}${key}**: ${helpCommand[key]}\n`;
+          } else {
+            helpMessage += `**${key}**:\n`;
+            for (const command of Object.keys(helpCommand[key])) {
+              helpMessage += `\t**${prefix}${key} ${
+                command === 'default' ? '' : command
+              }**:  ${helpCommand[key][command]}\n`;
+            }
+          }
+        }
+        await message.channel.send(helpMessage);
+      }
+    });
   }
 }
 // const discordConfig = async () => {

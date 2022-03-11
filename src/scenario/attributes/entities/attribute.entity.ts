@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MessageEmbed } from 'discord.js';
 import {
   Column,
   CreateDateColumn,
@@ -36,13 +37,20 @@ export class Attribute {
   @ApiProperty()
   resume: string;
   @Column({ type: 'text', nullable: true })
-  @ApiProperty()
-  description: string;
-
+  // @ApiProperty()
+  // description: string;
   @CreateDateColumn({ name: 'created_at' })
   @ApiProperty()
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  toDiscordEmbeds() {
+    const embeds = new MessageEmbed({
+      title: `${this.name} - ${this.shortName}`,
+      description: this.resume,
+    });
+    return embeds;
+  }
 }
