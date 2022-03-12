@@ -20,7 +20,11 @@ import { DicesDiscordService } from './dices-discord.service';
 export class DicesDiscordController {
   constructor(private readonly service: DicesDiscordService) {}
 
-  @Command({ name: 'roll', description: 'Roll a dice', aliases: ['r'] })
+  @Command({
+    name: 'roll',
+    description: 'Faz uma rolagem com dados',
+    aliases: ['r'],
+  })
   async roll(
     @Author() author: User,
     @Channel() channel: TextChannel,

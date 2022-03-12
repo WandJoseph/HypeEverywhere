@@ -37,7 +37,9 @@ export class AttributeService extends HttpCrudService<Attribute> {
   async setShortname(ctx: BaseCrudContext) {
     const { dto } = ctx;
     const { shortName } = dto as Attribute;
-    ctx.dto.shortName = shortName.toUpperCase();
+    if (shortName) {
+      ctx.dto.shortName = shortName.toUpperCase();
+    }
   }
 
   @Before('update')
