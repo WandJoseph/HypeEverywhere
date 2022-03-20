@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import BaseCrudService from './base-crud.service';
 import { DiscordCrudContext } from './discord-crud.context.interface';
 
-export class HttpCrudService<Entity> extends BaseCrudService<Entity> {
+export class CrudHttpService<Entity> extends BaseCrudService<Entity> {
   constructor(protected readonly __repo: Repository<Entity>) {
     super(__repo);
   }

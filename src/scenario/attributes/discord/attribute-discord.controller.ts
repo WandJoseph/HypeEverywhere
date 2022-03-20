@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { TextChannel, User } from 'discord.js';
 import { Args, Author, Channel, Command, DiscordController } from '~/discord';
+import { toShortName, toUniqueString } from '~/utils';
 import { BaseCrudContext } from '~/utils/crud';
 import { AttributeDiscordService } from './attribute-discord.service';
 
@@ -21,19 +22,18 @@ export class AttributeDiscordController {
     @Args() args: string[],
     @Author() author: User,
   ) {
-    const name = args[0];
-    const msg = await channel.send(`Buscando o Atributo '${name}'`);
+    const shortName = toShortName(args[0]);
+    const uniqueName = toUniqueString(args[0]);
+
+    const msg = await channel.send(`Buscando o Atributo '${args[0]}'`);
     const ctx: BaseCrudContext = {
       options: {
-        where: [
-          { shortName: name.toUpperCase() },
-          { uniqueName: name.toLocaleLowerCase() },
-        ],
+        where: [{ shortName }, { uniqueName }],
       },
     };
     const atb = await this.service.findOneOrFail(
       ctx,
-      `Não foi possível encontrar o Atributo ${name}`,
+      `Não foi possível encontrar o Atributo '${args[0]}'`,
     );
     const embeds = atb.toDiscordEmbeds();
     await msg.edit({

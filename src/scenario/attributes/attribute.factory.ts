@@ -8,7 +8,7 @@ export class AttributeFactory extends BaseFactory<Attribute> {
     return {
       name: casual.name,
       resume: casual.title,
-      description: casual.description,
+      // description: casual.description,
       shortName: casual.letter + casual.letter + casual.letter,
       ...data,
     };

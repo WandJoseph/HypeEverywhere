@@ -1,46 +1,47 @@
 import { Body, Controller, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
-  BaseCrudContext,
   CreateRoute,
-  DeleteRoute,
-  FindAllQuery,
-  FindAllRoute,
-  FindOneParams,
-  FindOneRoute,
+  BaseCrudContext,
   UpdateRoute,
+  FindOneParams,
+  DeleteRoute,
+  FindOneRoute,
+  FindAllRoute,
+  FindAllQuery,
 } from '~/utils/crud';
-import { AttributeService } from './attribute.service';
-import { CreateAttributeDto } from './dto/create-attribute.dto';
-import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { Attribute } from './entities/attribute.entity';
+import { BarHttpService } from './bar.http.service';
+import { CreateBarDto } from '../dto/create-bar.dto';
+import { UpdateBarDto } from '../dto/update-bar.dto';
+import { Bar } from '../entities/bar.entity';
 
-@ApiTags('Attribute')
-@Controller('attribute')
-export class AttributeController {
-  constructor(private readonly service: AttributeService) {}
-
+@Controller('bar')
+@ApiTags('Bar')
+export class BarHttpController {
+  constructor(private readonly service: BarHttpService) {}
   @CreateRoute({
-    type: Attribute,
+    type: Bar,
   })
-  async create(@Body() dto: CreateAttributeDto) {
+  async create(@Body() dto: CreateBarDto) {
     const ctx: BaseCrudContext = {
       dto,
     };
     return await this.service.create(ctx);
   }
+
   @UpdateRoute({
-    type: Attribute,
+    type: Bar,
   })
-  update(@Param() params: FindOneParams, @Body() dto: UpdateAttributeDto) {
+  update(@Param() params: FindOneParams, @Body() dto: UpdateBarDto) {
     const ctx: BaseCrudContext = {
       id: params.id,
       dto,
     };
     return this.service.update(ctx);
   }
+
   @DeleteRoute({
-    type: Attribute,
+    type: Bar,
   })
   delete(@Param() params: FindOneParams) {
     const ctx: BaseCrudContext = {
@@ -48,8 +49,9 @@ export class AttributeController {
     };
     return this.service.delete(ctx);
   }
+
   @FindOneRoute({
-    type: Attribute,
+    type: Bar,
   })
   findOne(@Param() params: FindOneParams) {
     const ctx: BaseCrudContext = {
@@ -57,8 +59,9 @@ export class AttributeController {
     };
     return this.service.findOne(ctx);
   }
+
   @FindAllRoute({
-    type: Attribute,
+    type: Bar,
   })
   findAll(@Query() query: FindAllQuery) {
     const ctx: BaseCrudContext = {

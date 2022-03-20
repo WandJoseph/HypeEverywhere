@@ -2,7 +2,7 @@ import { IsString, Length } from 'class-validator';
 import { IsNotRequired } from '~/utils/validator/swagger-decorators/is-not-required.decorator';
 import { IsRequired } from '~/utils/validator/swagger-decorators/is-required.decorator';
 
-export class CreateAttributeDto {
+export class CreateBarDto {
   @IsRequired()
   @IsString()
   @Length(3, 16)

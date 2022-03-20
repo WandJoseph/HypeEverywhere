@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { toShortName, toUniqueString } from '~/utils';
-import { BaseCrudContext, Before } from '~/utils/crud';
+import { Before, BaseCrudContext } from '~/utils/crud';
 import { CrudHttpService } from '~/utils/crud/http-crud.service';
-import { Attribute } from './entities/attribute.entity';
+import { Bar } from '../entities/bar.entity';
 
 @Injectable()
-export class AttributeService extends CrudHttpService<Attribute> {
+export class BarHttpService extends CrudHttpService<Bar> {
   constructor(
-    @InjectRepository(Attribute)
-    private readonly repo: Repository<Attribute>,
+    @InjectRepository(Bar)
+    private readonly repo: Repository<Bar>,
   ) {
     super(repo);
   }
@@ -18,14 +18,14 @@ export class AttributeService extends CrudHttpService<Attribute> {
   @Before('update')
   async setUniqueName(ctx: BaseCrudContext) {
     const { dto } = ctx;
-    const { name } = dto as Attribute;
+    const { name } = dto as Bar;
     const uniqueName = toUniqueString(name);
     ctx.dto.uniqueName = uniqueName;
   }
 
   @Before('update')
   @Before('create')
-  async shouldNotExistUniqueNameAttribute(ctx: BaseCrudContext) {
+  async shouldNotExistUniqueNameBar(ctx: BaseCrudContext) {
     const { uniqueName } = ctx.dto;
     const id = ctx?.id || 0;
     ctx.id = { where: { uniqueName, id: Not(id) } };
@@ -38,14 +38,14 @@ export class AttributeService extends CrudHttpService<Attribute> {
   @Before('update')
   async setShortname(ctx: BaseCrudContext) {
     const { dto } = ctx;
-    const { shortName } = dto as Attribute;
+    const { shortName } = dto as Bar;
     if (shortName) {
       ctx.dto.shortName = toShortName(shortName);
     }
   }
   @Before('update')
   @Before('create')
-  async shouldNotExistShortNameAttribute(ctx: BaseCrudContext) {
+  async shouldNotExistShortNameBar(ctx: BaseCrudContext) {
     const { shortName } = ctx.dto;
     const id = ctx?.id || 0;
     ctx.id = { where: { shortName, id: Not(id) } };
