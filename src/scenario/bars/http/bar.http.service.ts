@@ -19,8 +19,9 @@ export class BarHttpService extends CrudHttpService<Bar> {
   async setUniqueName(ctx: BaseCrudContext) {
     const { dto } = ctx;
     const { name } = dto as Bar;
-    const uniqueName = toUniqueString(name);
-    ctx.dto.uniqueName = uniqueName;
+    if (name) {
+      ctx.dto.uniqueName = toUniqueString(name);
+    }
   }
 
   @Before('update')

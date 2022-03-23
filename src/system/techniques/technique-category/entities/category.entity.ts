@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ColorResolvable, HexColorString, MessageEmbed } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Bar {
+export class Category {
   @PrimaryGeneratedColumn()
   @ApiProperty()
   id: number;
@@ -18,18 +18,6 @@ export class Bar {
   @Column()
   @ApiProperty()
   name: string;
-
-  @Column({ default: '#ffffff' })
-  @ApiProperty()
-  color: HexColorString;
-
-  @Index()
-  @Column({
-    name: 'short_name',
-    unique: true,
-  })
-  @ApiProperty()
-  shortName: string;
   @Index()
   @Column({
     name: 'unique_name',
@@ -38,22 +26,21 @@ export class Bar {
   @ApiProperty()
   uniqueName: string;
 
-  @Column()
+  @Column('text', { nullable: true })
   @ApiProperty()
-  resume: string;
+  description?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   @ApiProperty()
   createdAt: Date;
-
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   toDiscordEmbeds() {
     const embeds = new MessageEmbed({
-      title: `${this.name} - ${this.shortName}`,
-      description: this.resume,
-      color: this.color,
+      title: `${this.name} `,
+      description: this.description,
+      fields: [],
     });
     return embeds;
   }

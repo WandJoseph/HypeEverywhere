@@ -119,7 +119,7 @@ export default abstract class BaseCrudService<Entity> {
     return ctx.result;
   }
   async delete(ctx: BaseCrudContext): Promise<DeleteResult> {
-    ctx = await this.baseExecution(ctx, 'update');
+    ctx = await this.baseExecution(ctx, 'delete');
     return ctx.result;
   }
   async findOne(ctx: BaseCrudContext): Promise<Entity> {
