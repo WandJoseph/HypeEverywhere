@@ -6,7 +6,7 @@ import { BaseCrudContext } from '~/utils/crud';
 import { CategoryDiscordService } from './category.discord.service';
 
 @DiscordController({
-  collection: 't category',
+  collection: 'tc',
 })
 @Controller()
 export class CategoryDiscordController {

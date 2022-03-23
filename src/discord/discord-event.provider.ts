@@ -201,7 +201,7 @@ export class DiscordEventProvider {
           return;
         }
         // SE FOR COLLECTION
-        if (!messageContent.startsWith(collection)) {
+        if (!messageContent.startsWith(collection + ' ')) {
           return;
         }
         messageContent = messageContent.slice(collection.length + 1);

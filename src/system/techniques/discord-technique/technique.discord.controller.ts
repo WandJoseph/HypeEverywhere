@@ -25,7 +25,7 @@ export class TechniqueDiscordController {
     const name = args.join(' ');
     const uniqueName = toUniqueString(name);
 
-    const msg = await channel.send(`Buscando a techniquera '${name}'`);
+    const msg = await channel.send(`Buscando a Técnica '${name}'`);
     const ctx: BaseCrudContext = {
       options: {
         where: [{ uniqueName }],
@@ -33,8 +33,9 @@ export class TechniqueDiscordController {
     };
     const technique = await this.service.findOneOrFail(
       ctx,
-      `Não foi possível encontrar a techniquera '${name}'`,
+      `Não foi possível encontrar a técnica '${name}'`,
     );
+    await this.service.getCategories(technique);
     const embeds = technique.toDiscordEmbeds();
     await msg.edit({
       content: `${author}`,

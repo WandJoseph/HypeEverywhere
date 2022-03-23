@@ -19,6 +19,15 @@ export enum TechniqueProficiency {
   Special = 'special',
 }
 
+const portugueseProficiency = {
+  improvisation: 'Improvisação',
+  beginner: 'Iniciante',
+  skillful: 'Hábil',
+  graduate: 'Graduado',
+  master: 'Mestre',
+  special: 'Especial',
+};
+
 @Entity()
 export class Technique {
   @PrimaryGeneratedColumn()
@@ -50,7 +59,6 @@ export class Technique {
   // cost
   // roll
   // effects
-  // categories
 
   @CreateDateColumn({ name: 'created_at' })
   @ApiProperty()
@@ -58,14 +66,20 @@ export class Technique {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  categories?: string[];
+
   toDiscordEmbeds() {
     const embeds = new MessageEmbed({
       title: `${this.name} `,
       description: this.description,
       fields: [
         {
-          name: 'Proficiency Limit',
-          value: this.proficiencyLimit,
+          name: 'Proficiência Máxima',
+          value: portugueseProficiency[this.proficiencyLimit],
+        },
+        {
+          name: 'Categories',
+          value: this.categories?.join(', ') || 'Sem Categorias',
         },
       ],
     });
