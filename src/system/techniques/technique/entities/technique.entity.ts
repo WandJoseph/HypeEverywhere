@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { APIEmbedField } from 'discord-api-types';
 import { MessageEmbed } from 'discord.js';
 import {
   Column,
@@ -8,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Effect } from '../../technique-effect/entities/effect.entity';
 
 // Improvisation / Beginner / Skillful / Graduate / Master
 export enum TechniqueProficiency {
@@ -18,6 +20,13 @@ export enum TechniqueProficiency {
   Master = 'master',
   Special = 'special',
 }
+export enum TechniqueDifficulty {
+  Easy = 'easy',
+  Normal = 'normal',
+  Medium = 'medium',
+  Difficult = 'difficult',
+  Special = 'special',
+}
 
 const portugueseProficiency = {
   improvisation: 'Improvisação',
@@ -25,6 +34,13 @@ const portugueseProficiency = {
   skillful: 'Hábil',
   graduate: 'Graduado',
   master: 'Mestre',
+  special: 'Especial',
+};
+const portugueseDifficulty = {
+  easy: 'Fácil',
+  normal: 'Normal',
+  medium: 'Médio',
+  difficult: 'Difícil',
   special: 'Especial',
 };
 
@@ -55,6 +71,12 @@ export class Technique {
   @ApiProperty()
   proficiencyLimit: TechniqueProficiency;
 
+  @Column({
+    default: TechniqueDifficulty.Medium,
+  })
+  @ApiProperty()
+  difficulty: TechniqueDifficulty;
+
   // acessibility
   // cost
   // roll
@@ -67,22 +89,37 @@ export class Technique {
   updatedAt: Date;
 
   categories?: string[];
+  effects?: Effect[];
 
   toDiscordEmbeds() {
-    const embeds = new MessageEmbed({
+    const effects: MessageEmbed[] = this.effects.map((effect) => {
+      const embed = effect.toDiscordEmbeds();
+      embed.setTitle(embed.title + ' (Efeito)');
+      embed.setColor('#d07fff');
+      return embed;
+    });
+    const embed = new MessageEmbed({
       title: `${this.name} `,
       description: this.description,
       fields: [
         {
           name: 'Proficiência Máxima',
+          inline: true,
           value: portugueseProficiency[this.proficiencyLimit],
         },
         {
-          name: 'Categories',
+          name: 'Categorias',
+          inline: true,
           value: this.categories?.join(', ') || 'Sem Categorias',
+        },
+        {
+          name: 'Dificuldade',
+          inline: true,
+          value: portugueseDifficulty[this.difficulty],
         },
       ],
     });
-    return embeds;
+
+    return [embed, ...effects];
   }
 }

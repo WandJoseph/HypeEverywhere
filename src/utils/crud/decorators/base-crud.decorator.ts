@@ -3,7 +3,13 @@ import { BaseCrudContext } from '../base-crud-context.interface';
 const BASE_CRUD_BEFORE_METHODS = 'base-crud:before-methods';
 const BASE_CRUD_AFTER_METHODS = 'base-crud:after-methods';
 
-export type MethodKeys = 'create' | 'update' | 'delete' | 'findOne' | 'findAll';
+export type MethodKeys =
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'findOne'
+  | 'findAll'
+  | 'all';
 
 export interface Method {
   (ctx: BaseCrudContext): any;
@@ -49,6 +55,13 @@ export class BaseCrudMetadataHandler {
   }
   addBeforeMethod(methodKey: MethodKeys, method: string): void {
     const methods = this.getAllBeforeMethods();
+    if (methodKey === 'all') {
+      for (const key of Object.keys(methods)) {
+        methods[key].push(method);
+      }
+      this.setAllBeforeMethods(methods);
+      return;
+    }
     methods[methodKey].push(method);
     this.setAllBeforeMethods(methods);
   }
@@ -58,6 +71,13 @@ export class BaseCrudMetadataHandler {
   }
   addAfterMethod(methodKey: MethodKeys, method: string): void {
     const methods = this.getAllAfterMethods();
+    if (methodKey === 'all') {
+      for (const key of Object.keys(methods)) {
+        methods[key].push(method);
+      }
+      this.setAllBeforeMethods(methods);
+      return;
+    }
     methods[methodKey].push(method);
     this.setAllAfterMethods(methods);
   }

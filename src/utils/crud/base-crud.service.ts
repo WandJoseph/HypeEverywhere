@@ -84,10 +84,12 @@ export default abstract class BaseCrudService<Entity> {
   protected async baseFindAll(ctx: BaseCrudContext) {
     const query: FindAllQuery = ctx.query || {};
     const take = query.take || 10;
+    const options = ctx.options || {};
     const skip = query.skip || 0;
     const [data, count] = await this.__repo.findAndCount({
       take,
-      skip,
+      skip, 
+      ...options,
     });
     ctx.result = {
       data,

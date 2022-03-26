@@ -1,0 +1,36 @@
+import { OnEvent } from '@nestjs/event-emitter';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AttributeHttpService } from '~/system/attributes/attribute/http/attribute.http.service';
+import BaseCrudService from '~/utils/crud/base-crud.service';
+import { Character } from '../character/entities/character.entity';
+import { CreateCharacterAttributeDto } from './dto/create-character-attribute.dto';
+import { CharacterAttribute } from './entities/character-attribute.entity';
+
+export class CharacterAttributeService extends BaseCrudService<CharacterAttribute> {
+  constructor(
+    @InjectRepository(CharacterAttribute)
+    private readonly repo: Repository<CharacterAttribute>,
+    private readonly attributeService: AttributeHttpService,
+  ) {
+    super(repo);
+  }
+
+  @OnEvent('character:created')
+  async onCharacterCreated(data: { character: Character }) {
+    const { character } = data;
+    const { data: attributes } = await this.attributeService.findAll({
+      query: { take: 50 },
+    });
+    for (const attribute of attributes) {
+      const dto: CreateCharacterAttributeDto = {
+        attributeId: attribute.id,
+        characterId: character.id,
+      };
+      this.create({
+        dto,
+      });
+    }
+    console.log(attributes);
+  }
+}

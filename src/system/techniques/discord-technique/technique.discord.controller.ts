@@ -36,10 +36,11 @@ export class TechniqueDiscordController {
       `Não foi possível encontrar a técnica '${name}'`,
     );
     await this.service.getCategories(technique);
+    await this.service.getEffects(technique);
     const embeds = technique.toDiscordEmbeds();
     await msg.edit({
       content: `${author}`,
-      embeds: [embeds],
+      embeds: [...embeds],
     });
   }
 }

@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseCrudContext, Before } from '~/utils/crud';
 import { CrudHttpService } from '~/utils/crud/http-crud.service';
+import { NestedInTechniqueCHS } from '../../technique/http/nested-in-technique.interface';
 import { TechniqueHttpService } from '../../technique/http/technique.http.service';
 import { TechniqueCategory } from '../entities/technique-category.entity';
 import { CategoryHttpService } from './category.http.service';
 
 @Injectable()
-export class TechniqueCategoryHttpService extends CrudHttpService<TechniqueCategory> {
+export class TechniqueCategoryHttpService
+  extends CrudHttpService<TechniqueCategory>
+  implements NestedInTechniqueCHS<TechniqueCategory>
+{
   constructor(
     @InjectRepository(TechniqueCategory)
     private readonly repo: Repository<TechniqueCategory>,
@@ -17,14 +21,12 @@ export class TechniqueCategoryHttpService extends CrudHttpService<TechniqueCateg
   ) {
     super(repo);
   }
-  @Before('create')
-  @Before('findAll')
+  @Before('all')
   async shouldExistTechnique(ctx: BaseCrudContext) {
-    const { params } = ctx;
-    const findCtx: BaseCrudContext = {
-      id: params.techniqueId,
-    };
-    await this.techniqueService.findOneOrFail(findCtx);
+    const { techniqueId } = ctx.params;
+    await this.techniqueService.findOneOrFail({
+      id: techniqueId,
+    });
   }
   @Before('create')
   async shouldExistCategory(ctx: BaseCrudContext) {
