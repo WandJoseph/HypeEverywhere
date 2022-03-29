@@ -1,5 +1,4 @@
 import { Repository } from 'typeorm/repository/Repository';
-import { BaseCrudContext } from './base-crud-context.interface';
 import 'reflect-metadata';
 
 import { DeleteResult, FindOneOptions, ObjectID, UpdateResult } from 'typeorm';
@@ -10,8 +9,12 @@ import {
   MethodKeys,
 } from './decorators/base-crud.decorator';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BaseCrudContext } from './base-crud-context.interface';
 
-export default abstract class BaseCrudService<Entity> {
+export default abstract class BaseCrudService<
+  Entity,
+  Context extends BaseCrudContext,
+> {
   private metadataHandler: BaseCrudMetadataHandler;
   private beforeMethods: CrudMethods;
   private afterMethods: CrudMethods;
@@ -41,8 +44,8 @@ export default abstract class BaseCrudService<Entity> {
   }
   protected async baseBefore(
     methodKey: MethodKeys,
-    ctx: BaseCrudContext,
-  ): Promise<BaseCrudContext> {
+    ctx: Context,
+  ): Promise<Context> {
     const methods = this.beforeMethods[methodKey];
     for (const method of methods) {
       ctx = (await this[method](ctx)) || ctx;
@@ -51,8 +54,8 @@ export default abstract class BaseCrudService<Entity> {
   }
   protected async baseAfter(
     methodKey: MethodKeys,
-    ctx: BaseCrudContext,
-  ): Promise<BaseCrudContext> {
+    ctx: Context,
+  ): Promise<Context> {
     const methods = this.afterMethods[methodKey];
     for (const method of methods) {
       ctx = (await this[method](ctx)) || ctx;
@@ -60,35 +63,35 @@ export default abstract class BaseCrudService<Entity> {
     return ctx;
   }
 
-  protected async baseCreate(ctx: BaseCrudContext) {
+  protected async baseCreate(ctx: Context) {
     const { dto } = ctx;
     const data = this.__repo.create(dto as Entity);
     ctx.entity = await this.__repo.save(data);
     return ctx;
   }
-  protected async baseUpdate(ctx: BaseCrudContext) {
+  protected async baseUpdate(ctx: Context) {
     const { dto, id } = ctx;
     ctx.result = this.__repo.update(id, dto);
     return ctx;
   }
-  protected async baseDelete(ctx: BaseCrudContext) {
+  protected async baseDelete(ctx: Context) {
     const { id } = ctx;
     ctx.result = await this.__repo.delete(id);
     return ctx;
   }
-  protected async baseFindOne(ctx: BaseCrudContext) {
+  protected async baseFindOne(ctx: Context) {
     const { id, options } = ctx;
     ctx.entity = await this.__repo.findOne(id, options);
     return ctx;
   }
-  protected async baseFindAll(ctx: BaseCrudContext) {
+  protected async baseFindAll(ctx: Context) {
     const query: FindAllQuery = ctx.query || {};
     const take = query.take || 10;
     const options = ctx.options || {};
     const skip = query.skip || 0;
     const [data, count] = await this.__repo.findAndCount({
       take,
-      skip, 
+      skip,
       ...options,
     });
     ctx.result = {
@@ -105,30 +108,30 @@ export default abstract class BaseCrudService<Entity> {
     findOne: 'baseFindOne',
     findAll: 'baseFindAll',
   };
-  async baseExecution(ctx: BaseCrudContext, method: MethodKeys) {
+  async baseExecution(ctx: Context, method: MethodKeys) {
     ctx = await this.baseBefore(method, ctx);
     ctx = await this[this.baseMethods[method]](ctx);
     ctx = await this.baseAfter(method, ctx);
     return ctx;
   }
 
-  async create(ctx: BaseCrudContext): Promise<Entity> {
+  async create(ctx: Context): Promise<Entity> {
     ctx = await this.baseExecution(ctx, 'create');
     return ctx.entity;
   }
-  async update(ctx: BaseCrudContext): Promise<UpdateResult> {
+  async update(ctx: Context): Promise<UpdateResult> {
     ctx = await this.baseExecution(ctx, 'update');
     return ctx.result;
   }
-  async delete(ctx: BaseCrudContext): Promise<DeleteResult> {
+  async delete(ctx: Context): Promise<DeleteResult> {
     ctx = await this.baseExecution(ctx, 'delete');
     return ctx.result;
   }
-  async findOne(ctx: BaseCrudContext): Promise<Entity> {
+  async findOne(ctx: Context): Promise<Entity> {
     ctx = await this.baseExecution(ctx, 'findOne');
     return ctx.entity;
   }
-  async findAll(ctx: BaseCrudContext): Promise<FindAllResult<Entity>> {
+  async findAll(ctx: Context): Promise<FindAllResult<Entity>> {
     ctx = await this.baseExecution(ctx, 'findAll');
     return ctx.result;
   }

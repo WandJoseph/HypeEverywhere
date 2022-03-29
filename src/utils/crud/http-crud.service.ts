@@ -1,10 +1,14 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EmbedField } from 'discord.js';
 import { Repository } from 'typeorm';
+import { BaseCrudContext } from './base-crud-context.interface';
 import BaseCrudService from './base-crud.service';
 import { DiscordCrudContext } from './discord-crud.context.interface';
 
-export class CrudHttpService<Entity> extends BaseCrudService<Entity> {
+export class HttpCrudService<Entity> extends BaseCrudService<
+  Entity,
+  BaseCrudContext
+> {
   constructor(protected readonly __repo: Repository<Entity>) {
     super(__repo);
   }

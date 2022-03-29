@@ -93,7 +93,7 @@ export class Technique {
 
   toDiscordEmbeds() {
     const effects: MessageEmbed[] = this.effects.map((effect) => {
-      const embed = effect.toDiscordEmbeds();
+      const embed = effect.toDiscordEmbeds()[0];
       embed.setTitle(embed.title + ' (Efeito)');
       embed.setColor('#d07fff');
       return embed;

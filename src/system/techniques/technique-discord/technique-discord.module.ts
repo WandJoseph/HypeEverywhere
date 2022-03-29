@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DicesModule } from '~/dices/dices.module';
+import { CharacterDiscordModule } from '~/users/character-discord/character.discord.module';
 import { TechniqueCategoryModule } from '../technique-category/technique-category.module';
 import { TechniqueEffectModule } from '../technique-effect/technique-effect.module';
 import { Technique } from '../technique/entities/technique.entity';
@@ -13,8 +15,10 @@ import { TechniqueDiscordService } from './technique.discord.service';
     TechniqueModule,
     TechniqueCategoryModule,
     TechniqueEffectModule,
+    CharacterDiscordModule,
+    DicesModule,
   ],
   controllers: [TechniqueDiscordController],
   providers: [TechniqueDiscordService],
 })
-export class DiscordTechniqueModule {}
+export class TechniqueDiscordModule {}

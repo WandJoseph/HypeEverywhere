@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MessageActionRow, MessageButton } from 'discord.js';
 import { Repository } from 'typeorm';
 import { BaseCrudContext } from '~/utils/crud';
 import { DiscordCrudService } from '~/utils/crud/discord-crud.service';
@@ -20,6 +21,28 @@ export class TechniqueDiscordService extends DiscordCrudService<Technique> {
     super(repo);
   }
 
+  getEffectsActions({ effects }: Technique): {
+    actionRow: MessageActionRow;
+    keys: string[];
+  } {
+    const actionRow = new MessageActionRow();
+
+    const effectsKey: string[] = [];
+    actionRow.addComponents(
+      effects.map((e) => {
+        const btn = new MessageButton();
+        btn.setStyle('PRIMARY');
+        btn.setLabel(e.name);
+        btn.setCustomId(e.uniqueName);
+        effectsKey.push(e.uniqueName);
+        return btn;
+      }),
+    );
+    return {
+      actionRow,
+      keys: effectsKey,
+    };
+  }
   async getCategories(technique: Technique) {
     const techniqueCategories = await this.techniqueCategoryService.findAll({
       params: { techniqueId: technique.id },

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseCrudContext, Before } from '~/utils/crud';
-import { CrudHttpService } from '~/utils/crud/http-crud.service';
+import { HttpCrudService } from '~/utils/crud/http-crud.service';
 import { NestedInTechniqueCHS } from '../../technique/http/nested-in-technique.interface';
 import { TechniqueHttpService } from '../../technique/http/technique.http.service';
 import { TechniqueCategory } from '../entities/technique-category.entity';
@@ -10,7 +10,7 @@ import { CategoryHttpService } from './category.http.service';
 
 @Injectable()
 export class TechniqueCategoryHttpService
-  extends CrudHttpService<TechniqueCategory>
+  extends HttpCrudService<TechniqueCategory>
   implements NestedInTechniqueCHS<TechniqueCategory>
 {
   constructor(

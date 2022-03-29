@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { toUniqueString } from '~/utils';
 import { Before, BaseCrudContext } from '~/utils/crud';
-import { CrudHttpService } from '~/utils/crud/http-crud.service';
+import { HttpCrudService } from '~/utils/crud/http-crud.service';
 import { NestedInTechniqueCHS } from '../../technique/http/nested-in-technique.interface';
 import { TechniqueHttpService } from '../../technique/http/technique.http.service';
 import { Effect } from '../entities/effect.entity';
 
 @Injectable()
 export class TechniqueEffectHttpService
-  extends CrudHttpService<Effect>
+  extends HttpCrudService<Effect>
   implements NestedInTechniqueCHS<Effect>
 {
   constructor(

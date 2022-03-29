@@ -17,6 +17,9 @@ export class CharacterAttribute {
   @ApiProperty()
   attributeId: number;
 
+  name?: string;
+  shortName?: string;
+
   @Column({ default: 11 })
   @ApiProperty()
   value: number;

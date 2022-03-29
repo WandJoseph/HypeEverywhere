@@ -31,7 +31,12 @@ export class DicesDiscordController {
     @Args() args: string[],
   ) {
     const msg = await channel.send('Rolling a dice...');
-    const roll = this.service.roll(...args);
+    const roll = this.service.roll({
+      author,
+      message: msg,
+      args,
+      channel,
+    });
     const color: ColorResolvable = '#ffffff';
 
     const embed = new MessageEmbed({
@@ -57,60 +62,12 @@ export class DicesDiscordController {
     description: 'Automatic insert default dice for Wand Roll',
     aliases: ['w'],
   })
-  async WandRoll(
+  async wandRoll(
     @Author() author: User,
     @Channel() channel: TextChannel,
     @Args() args: string[],
   ) {
-    const msg = await channel.send('Rolling a dice...');
-    args = ['3d10', '<', ...args];
-    const roll = this.service.roll(...args);
-    const margin = roll.rightTotal - roll.leftTotal;
-    const criticSuccess = roll.leftTotal <= 5;
-    const criticFail = roll.leftTotal >= 27;
-
-    const color: ColorResolvable = criticSuccess
-      ? '#ffbd33'
-      : criticFail
-      ? '#000000'
-      : roll.result
-      ? '#00ff00'
-      : '#ff0000';
-    const title = criticSuccess
-      ? ' :star: SUCESSSO CRITICO!! :star:'
-      : criticFail
-      ? ' :skull_crossbones: FALHA CRITICA HAHA!! :skull_crossbones:'
-      : roll.result
-      ? 'Sucesso!'
-      : 'Falha!';
-
-    const rollField: EmbedField = {
-      name: 'Rolagem',
-      value: `${roll.leftTotal}`,
-      inline: true,
-    };
-
-    const habilityField: EmbedField = {
-      name: 'Nível de Habilidade',
-      value: `${roll.rightTotal}`,
-      inline: true,
-    };
-    const totalField: EmbedField = {
-      name: `Margem: ${margin}`,
-      value: `${roll.rightTotal}-${roll.leftTotal} = ${margin}`,
-      inline: false,
-    };
-
-    const embed = new MessageEmbed({
-      color,
-      description: `${roll.leftDiceExpr} ${roll.operator} ${roll.rightDiceExpr}`,
-      title,
-      fields: [rollField, habilityField, totalField],
-    });
-
-    await msg.edit({
-      content: `${author}`,
-      embeds: [embed],
-    });
+    const message = await channel.send('Rolling a dice...');
+    await this.service.wandRoll({ author, message, args, channel });
   }
 }

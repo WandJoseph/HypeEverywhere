@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MessageEmbed } from 'discord.js';
 import {
   Column,
   CreateDateColumn,
@@ -8,10 +9,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Attribute } from '~/system/attributes/attribute/entities/attribute.entity';
+import { CharacterAttribute } from '~/users/character-attribute/entities/character-attribute.entity';
 
 export enum Element {
-  Fire = 'Fire',
-  Water = 'Water',
+  Fire = 'fire',
+  Water = 'water',
   Earth = 'earth',
   Air = 'air',
   Lightning = 'lightning',
@@ -22,6 +24,9 @@ export class Character {
   @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ default: '479115840529367050' })
+  ownerId: string;
 
   @ApiProperty()
   @Column({ nullable: true })
@@ -49,7 +54,7 @@ export class Character {
   @Column({ nullable: true })
   personality: string;
 
-  attributes: Attribute[];
+  attributes: CharacterAttribute[];
 
   @CreateDateColumn({ name: 'created_at' })
   @ApiProperty()
@@ -57,4 +62,21 @@ export class Character {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  toDiscordEmbeds(): MessageEmbed[] {
+    const embed = new MessageEmbed({
+      title: this.name || 'Não Cadastrado',
+      description: `${this.quote ? `${this.quote}' ~ *${this.name}*` : ''}
+     ${this.nationality ? `Nacionalidade: ${this.nationality}` : ''}
+     ${this.element ? `Elemento: ${this.element}` : ''}`,
+    });
+    this.personality && embed.addField('Personalidade', this.personality);
+    if (this.attributes) {
+      const attributes = this.attributes
+        .map((attribute) => `${attribute.name}: \t ${attribute.value}`)
+        .join('\n');
+      embed.addField('Atributos', attributes);
+    }
+    return [embed];
+  }
 }

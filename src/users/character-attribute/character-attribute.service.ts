@@ -2,12 +2,14 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AttributeHttpService } from '~/system/attributes/attribute/http/attribute.http.service';
-import BaseCrudService from '~/utils/crud/base-crud.service';
+
+import { DiscordCrudService } from '~/utils/crud/discord-crud.service';
+import { HttpCrudService } from '~/utils/crud/http-crud.service';
 import { Character } from '../character/entities/character.entity';
 import { CreateCharacterAttributeDto } from './dto/create-character-attribute.dto';
 import { CharacterAttribute } from './entities/character-attribute.entity';
 
-export class CharacterAttributeService extends BaseCrudService<CharacterAttribute> {
+export class CharacterAttributeService extends HttpCrudService<CharacterAttribute> {
   constructor(
     @InjectRepository(CharacterAttribute)
     private readonly repo: Repository<CharacterAttribute>,
@@ -31,6 +33,5 @@ export class CharacterAttributeService extends BaseCrudService<CharacterAttribut
         dto,
       });
     }
-    console.log(attributes);
   }
 }

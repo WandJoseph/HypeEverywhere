@@ -17,6 +17,7 @@ import {
   DiscordControllerMetadataHandler,
 } from './decorator/discord-controller.decorator';
 import { DiscordOptions } from './discord-options.interface';
+import { onMessageErrorHandler } from './discord.utils';
 
 interface Commands {
   [command: string]: {
@@ -123,27 +124,6 @@ export class DiscordEventProvider {
     return args;
   }
 
-  async onMessageErrorHandler(message: Message, error: any) {
-    const ctx: DiscordCrudContext = error?.ctx;
-    if (!ctx) {
-      const formatedResponse = `${message.author}, ${error.message}`;
-      await message.channel.send(formatedResponse);
-      return;
-    }
-    const type = error.error;
-    const errorMessage = error.message;
-    const responseAuthor = ctx.author || message.author;
-    const responseChannel = ctx.responseChannel;
-    const formatedResponse = `${responseAuthor}, ${errorMessage} - \`${type}\``;
-    if (responseChannel) {
-      await responseChannel.send(formatedResponse);
-    } else if (ctx.msg) {
-      await ctx.msg.edit(formatedResponse);
-    } else {
-      await message.channel.send(formatedResponse);
-    }
-  }
-
   onMessage() {
     const helpCommand: {
       [key: string]:
@@ -195,7 +175,7 @@ export class DiscordEventProvider {
             try {
               await controller[cmd.methodKey](...args);
             } catch (error) {
-              await this.onMessageErrorHandler(message, error);
+              await onMessageErrorHandler(message, error);
             }
           }
           return;
@@ -225,7 +205,7 @@ export class DiscordEventProvider {
           try {
             await controller[cmd.methodKey](...args);
           } catch (error) {
-            await this.onMessageErrorHandler(message, error);
+            await onMessageErrorHandler(message, error);
           }
         }
       });

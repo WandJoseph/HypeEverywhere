@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { toShortName, toUniqueString } from '~/utils';
 import { Before, BaseCrudContext } from '~/utils/crud';
-import { CrudHttpService } from '~/utils/crud/http-crud.service';
+import { HttpCrudService } from '~/utils/crud/http-crud.service';
 import { Bar } from '../entities/bar.entity';
 
 @Injectable()
-export class BarHttpService extends CrudHttpService<Bar> {
+export class BarHttpService extends HttpCrudService<Bar> {
   constructor(
     @InjectRepository(Bar)
     private readonly repo: Repository<Bar>,

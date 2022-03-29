@@ -4,12 +4,12 @@ import { Repository } from 'typeorm';
 import { CharacterHttpService } from '~/users/character/http/character.http.service';
 import { NestedInCharacterService } from '~/users/character/nested-in-character.interface';
 import { Before, BaseCrudContext } from '~/utils/crud';
-import { CrudHttpService } from '~/utils/crud/http-crud.service';
+import { HttpCrudService } from '~/utils/crud/http-crud.service';
 import { CharacterAttribute } from '../entities/character-attribute.entity';
 
 @Injectable()
 export class CharacterAttributeHttpService
-  extends CrudHttpService<CharacterAttribute>
+  extends HttpCrudService<CharacterAttribute>
   implements NestedInCharacterService<CharacterAttribute>
 {
   constructor(

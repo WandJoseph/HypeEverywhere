@@ -51,15 +51,17 @@ export class Effect {
   }
 
   toDiscordEmbeds() {
-    return new MessageEmbed({
-      title: this.name,
-      description: `${this.description}`,
-      fields: [
-        {
-          name: 'Rolagem',
-          value: this.nh,
-        },
-      ],
-    });
+    return [
+      new MessageEmbed({
+        title: this.name,
+        description: `${this.description}`,
+        fields: [
+          {
+            name: 'Rolagem',
+            value: this.nh,
+          },
+        ],
+      }),
+    ];
   }
 }

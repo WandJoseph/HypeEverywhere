@@ -8,7 +8,10 @@ import BaseCrudService from './base-crud.service';
 import { Before } from './decorators/base-crud.decorator';
 import { DiscordCrudContext } from './discord-crud.context.interface';
 
-export class DiscordCrudService<Entity> extends BaseCrudService<Entity> {
+export class DiscordCrudService<Entity> extends BaseCrudService<
+  Entity,
+  DiscordCrudContext
+> {
   constructor(protected readonly __repo: Repository<Entity>) {
     super(__repo);
   }

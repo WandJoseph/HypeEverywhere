@@ -6,8 +6,6 @@ export type MathOperator = '+' | '-' | '*' | '/';
 export type LogicOperator = '<' | '>' | '<=' | '>=' | '==' | '!=';
 
 export class Roll {
-  public originalExpr: string;
-  public expression: string;
   public rightExpr: string;
   public rightDiceExpr: string;
   public rightValues: Array<Dice | string>;
@@ -32,11 +30,6 @@ export class Roll {
     }
     this.leftExpr = expression;
     this.rightExpr = '';
-  }
-  splitBySymbol(expression: string) {
-    this.originalExpr = expression;
-    const re = /([-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/])/g;
-    this.expression = expression.replace(re, ' $1 ');
   }
   getTotalFromExpression(expr: string) {
     const args = expr.split(' ');
@@ -83,9 +76,11 @@ export class Roll {
     this.result = evaluate(this.leftTotal + this.operator + this.rightTotal);
   }
 
-  constructor(...args: any[]) {
-    this.expression = args.join(' ');
-    this.splitBySymbol(this.expression);
+  constructor(
+    public readonly expression: string,
+    public readonly originalExpr?: string,
+  ) {
+    this.originalExpr = originalExpr || expression;
     this.splitByOperator(this.expression);
     this.leftValues = this.getTotalFromExpression(this.leftExpr);
     this.rightValues = this.getTotalFromExpression(this.rightExpr);

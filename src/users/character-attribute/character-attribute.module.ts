@@ -15,5 +15,6 @@ import { CharacterAttributeHttpService } from './http/character.attribuite.http.
   ],
   controllers: [CharacterAttributeHttpController],
   providers: [CharacterAttributeService, CharacterAttributeHttpService],
+  exports: [CharacterAttributeService, CharacterAttributeHttpService],
 })
 export class CharacterAttributeModule {}
