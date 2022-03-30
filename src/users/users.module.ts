@@ -13,7 +13,6 @@ import { UserModule } from './user/user.module';
     CharacterAttributeModule,
     CharacterDiscordModule,
     CharacterTechniqueModule,
-    ConditionsModule,
     UserModule,
     UserCharacterModule,
   ],
