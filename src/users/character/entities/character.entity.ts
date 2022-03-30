@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Attribute } from '~/system/attributes/attribute/entities/attribute.entity';
 import { CharacterAttribute } from '~/users/character-attribute/entities/character-attribute.entity';
+import { CharacterTechnique } from '~/users/character-technique/entities/character-technique.entity';
 
 export enum Element {
   Fire = 'fire',
@@ -55,6 +56,7 @@ export class Character {
   personality: string;
 
   attributes: CharacterAttribute[];
+  techniques: CharacterTechnique[];
 
   @CreateDateColumn({ name: 'created_at' })
   @ApiProperty()

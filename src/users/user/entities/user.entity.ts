@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { Character } from '~/users/character/entities/character.entity';
 
 @Entity()
@@ -10,5 +10,7 @@ export class User {
 
   characters: Character[];
 
-  main: Character;
+  mainCharacter?: Character;
+  @Column({ nullable: true })
+  mainCharacterId: number;
 }

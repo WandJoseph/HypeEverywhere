@@ -18,9 +18,13 @@ export class UserCharacterDiscordService {
     const user = await this.userService.findOneOrFail({
       id: author.id,
     });
-    const characters = await this.characterService.findAll({
+    const charactersResult = await this.characterService.findAll({
       options: { where: { ownerId: user.id } },
     });
-    return characters;
+    const mainCharacter = await this.characterService.findOne({
+      id: user.mainCharacterId,
+    });
+
+    return { charactersResult, mainCharacter };
   }
 }

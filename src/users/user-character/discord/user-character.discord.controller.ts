@@ -11,7 +11,10 @@ import { UserCharacterDiscordService } from './user-character.discord.service';
   collection: 'pj',
 })
 export class UserCharacterDiscordController {
-  constructor(private readonly service: UserCharacterDiscordService) {}
+  constructor(
+    private readonly userService: UserDiscordService,
+    private readonly service: UserCharacterDiscordService,
+  ) {}
 
   @Command({
     name: 'list',
@@ -23,15 +26,21 @@ export class UserCharacterDiscordController {
     @Args() args: string[],
   ) {
     const msg = await channel.send(`Buscando seus Personagens`);
-    const result = await this.service.findAll({
+    const { charactersResult, mainCharacter } = await this.service.findAll({
       author,
     });
     const page = args[0] || 1;
-    const embeds = result.data.map((char: Character, index: number) => {
-      const embed = char.toDiscordEmbeds()[0];
-      embed.setTitle(`${index + 1} - ` + embed.title);
-      return embed;
-    });
+    const embeds = charactersResult.data.map(
+      (char: Character, index: number) => {
+        const embed = char.toDiscordEmbeds()[0];
+        embed.setTitle(`${index + 1} - ` + embed.title);
+        return embed;
+      },
+    );
+    const mainCharacterEmbed = mainCharacter.toDiscordEmbeds()[0];
+    mainCharacterEmbed.setTitle(
+      `${mainCharacterEmbed.title} (Personagem Principal)`,
+    );
     await msg.edit({
       embeds: [
         new MessageEmbed({
@@ -42,11 +51,7 @@ export class UserCharacterDiscordController {
           description: `Personagens, Página ${page}
         Para ver mais personagens, use o comando \`!pj list <página>\``,
         }),
-        new MessageEmbed({
-          title: 'Personagem Principal',
-          description: `Personagens, Página ${page}
-        Para ver mais personagens, use o comando \`!pj list <página>\``,
-        }),
+        mainCharacterEmbed,
         ...embeds,
       ],
     });
