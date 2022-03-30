@@ -5,16 +5,16 @@ import { BaseCrudContext } from '~/utils/crud';
 import { CharacterDiscordService } from './character.discord.service';
 
 @DiscordController({
-  collection: 'char',
+  collection: 'pj',
 })
 @Controller()
 export class CharacterDiscordController {
   constructor(private readonly service: CharacterDiscordService) {}
 
   @Command({
-    name: '',
-    description: 'Mostrar descrição de um',
-    aliases: ['mostrar', 'show', 'find'],
+    name: 'show',
+    description: 'Mostrar descrição de um personagem',
+    aliases: ['mostrar', 'find'],
   })
   async findOne(
     @Channel() channel: TextChannel,
@@ -23,7 +23,7 @@ export class CharacterDiscordController {
   ) {
     const id = args.join(' ');
 
-    const msg = await channel.send(`Buscando o Character '${id}'`);
+    const msg = await channel.send(`Buscando o personagem '${id}'`);
     const ctx: BaseCrudContext = {
       options: {
         where: [{ id }],
@@ -31,7 +31,7 @@ export class CharacterDiscordController {
     };
     const character = await this.service.findOneOrFail(
       ctx,
-      `Não foi possível encontrar a técnica '${id}'`,
+      `Não foi possível encontrar o personagem '${id}'`,
     );
     await this.service.getAttributes(character);
     const embeds = character.toDiscordEmbeds();

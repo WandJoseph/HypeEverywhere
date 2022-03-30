@@ -5,6 +5,7 @@ import {
   BaseCrudContext,
   DeleteRoute,
   FindAllRoute,
+  FindOneIdStringParams,
   FindOneParams,
   FindOneRoute,
   UpdateRoute,
@@ -42,7 +43,7 @@ export class UserHttpController {
   @DeleteRoute({
     type: User,
   })
-  delete(@Param() params: FindOneParams) {
+  delete(@Param() params: FindOneIdStringParams) {
     const ctx: BaseCrudContext = {
       id: params.id,
     };
@@ -51,7 +52,7 @@ export class UserHttpController {
   @FindOneRoute({
     type: User,
   })
-  findOne(@Param() params: FindOneParams) {
+  findOne(@Param() params: FindOneIdStringParams) {
     const ctx: BaseCrudContext = {
       id: params.id,
     };

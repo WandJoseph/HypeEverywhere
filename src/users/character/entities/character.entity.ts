@@ -67,7 +67,7 @@ export class Character {
 
   toDiscordEmbeds(): MessageEmbed[] {
     const embed = new MessageEmbed({
-      title: this.name || 'Não Cadastrado',
+      title: `ID: ${this.id}, ` + (this.name || 'Não Cadastrado'),
       description: `${this.quote ? `${this.quote}' ~ *${this.name}*` : ''}
      ${this.nationality ? `Nacionalidade: ${this.nationality}` : ''}
      ${this.element ? `Elemento: ${this.element}` : ''}`,

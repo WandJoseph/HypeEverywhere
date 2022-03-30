@@ -5,6 +5,7 @@ import { CharacterAttribute } from '~/users/character-attribute/entities/charact
 import { Character } from '~/users/character/entities/character.entity';
 
 export enum Event {
+  CHARACTER_CREATED = 'character:created',
   WAND_DICE_ROLLED = 'wand-dice:rolled',
 }
 
@@ -15,6 +16,9 @@ export interface Payload {
     author: User;
     characterAttributes?: CharacterAttribute[];
     technique: Technique;
+  };
+  [Event.CHARACTER_CREATED]: {
+    character: Character;
   };
 }
 

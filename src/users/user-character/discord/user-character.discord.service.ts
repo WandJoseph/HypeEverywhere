@@ -15,15 +15,26 @@ export class UserCharacterDiscordService {
   ) {}
 
   async findAll({ author }: DiscordCrudContext) {
+    let mainCharacter: Character;
     const user = await this.userService.findOneOrFail({
       id: author.id,
     });
     const charactersResult = await this.characterService.findAll({
       options: { where: { ownerId: user.id } },
     });
-    const mainCharacter = await this.characterService.findOne({
-      id: user.mainCharacterId,
-    });
+    if (user.mainCharacterId) {
+      mainCharacter = await this.characterService.findOne({
+        id: user.mainCharacterId,
+      });
+      if (!mainCharacter) {
+        await this.userService.update({
+          id: user.id,
+          dto: {
+            mainCharacterId: null,
+          },
+        });
+      }
+    }
 
     return { charactersResult, mainCharacter };
   }

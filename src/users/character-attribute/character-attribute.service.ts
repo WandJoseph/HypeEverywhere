@@ -5,6 +5,7 @@ import { AttributeHttpService } from '~/system/attributes/attribute/http/attribu
 
 import { DiscordCrudService } from '~/utils/crud/discord-crud.service';
 import { HttpCrudService } from '~/utils/crud/http-crud.service';
+import { Event, Payload } from '~/utils/events';
 import { Character } from '../character/entities/character.entity';
 import { CreateCharacterAttributeDto } from './dto/create-character-attribute.dto';
 import { CharacterAttribute } from './entities/character-attribute.entity';
@@ -18,9 +19,8 @@ export class CharacterAttributeService extends HttpCrudService<CharacterAttribut
     super(repo);
   }
 
-  @OnEvent('character:created')
-  async onCharacterCreated(data: { character: Character }) {
-    const { character } = data;
+  @OnEvent(Event.CHARACTER_CREATED)
+  async onCharacterCreated({ character }: Payload[Event.CHARACTER_CREATED]) {
     const { data: attributes } = await this.attributeService.findAll({
       query: { take: 50 },
     });
