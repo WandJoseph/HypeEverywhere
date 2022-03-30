@@ -11,7 +11,9 @@ const send = async (
   message?: Message,
   channel?: TextChannel,
 ) => {
-  return message ? await message.edit(content) : await channel.send(content);
+  return message
+    ? await message.channel.send(content)
+    : await channel.send(content);
 };
 export const onMessageErrorHandler = async (
   message: Message,
@@ -32,7 +34,7 @@ export const onMessageErrorHandler = async (
   if (responseChannel) {
     await responseChannel.send(formatedResponse);
   } else if (ctx.msg) {
-    await ctx.msg.edit(formatedResponse);
+    await ctx.msg.channel.send(formatedResponse);
   } else {
     await message.channel.send(formatedResponse);
   }

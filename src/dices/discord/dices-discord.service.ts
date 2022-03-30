@@ -14,12 +14,17 @@ import { Dice } from '../entities/dice.entitiy';
 import { Roll } from '../entities/roll.entity';
 import { OnEvent } from '@nestjs/event-emitter';
 import { onMessageErrorHandler } from '~/discord/discord.utils';
+import { Event, Payload } from '~/utils/events';
+import { WandRoll } from '../entities/wand-roll.entity';
+import { DiscordCrudContext } from '~/utils/crud/discord-crud.context.interface';
 
+interface ExpressionHandlerOptions {
+  character?: Character;
+}
 interface RollOptions {
-  message?: Message<boolean>;
-  channel: TextChannel;
-  author: User;
-  args: any[];
+  character?: Character;
+}
+interface WandRollOptions {
   character?: Character;
 }
 export class DicesDiscordService {
@@ -47,102 +52,65 @@ export class DicesDiscordService {
     return expr;
   }
 
-  isNumber(value: string) {
-    return !isNaN(+value);
-  }
-  isDice(value: string) {
-    const rolls: string[] = value.split('d');
-    if (rolls.length !== 2) return false;
-    if (!this.isNumber(rolls[0]) || !this.isNumber(rolls[1])) return false;
-    return true;
-  }
-  isOperator(value: string) {
-    return value === '+' || value === '-' || value === '*' || value === '/';
-  }
-
-  roll({ character, args }: RollOptions) {
-    // RESOLVE ARGS
-    const originalExpr = args.join(' ');
-    let expression = this.handleExpressionSymbols(originalExpr);
+  getExpressions(args: string[], options: ExpressionHandlerOptions = {}) {
+    const { character } = options;
+    const originalExpression = args.join(' ');
+    let treatedExpression = this.handleExpressionSymbols(originalExpression);
     if (character) {
-      expression = this.handleExpressionAttributes(
-        character.attributes,
-        expression,
+      treatedExpression = this.handleExpressionAttributes(
+        character?.attributes,
+        originalExpression,
       );
     }
-    const roll = new Roll(expression, originalExpr);
+    return { treatedExpression, originalExpression };
+  }
+
+  async roll(args: string[], options: RollOptions = {}) {
+    const { character } = options;
+    const { treatedExpression, originalExpression } = this.getExpressions(
+      args,
+      {
+        character,
+      },
+    );
+    const roll = new Roll(treatedExpression, originalExpression);
     return roll;
   }
-  dice(n: number, f: number): Dice {
-    const dice = new Dice(n, f);
-    return dice;
-  }
 
-  async wandRoll({ args, message, character, author, channel }: RollOptions) {
-    args = ['3d10 <', ...args];
-    const roll = this.roll({
+  async wandRoll(args: string[], options: WandRollOptions = {}) {
+    const { character } = options;
+    const { treatedExpression, originalExpression } = this.getExpressions(
       args,
-      message,
-      author,
-      character,
-      channel,
-    });
-    const margin = roll.rightTotal - roll.leftTotal;
-    const criticSuccess = roll.leftTotal <= 5;
-    const criticFail = roll.leftTotal >= 27;
-
-    const color: ColorResolvable = criticSuccess
-      ? '#ffbd33'
-      : criticFail
-      ? '#000000'
-      : roll.result
-      ? '#00ff00'
-      : '#ff0000';
-    const title = criticSuccess
-      ? ' :star: SUCESSSO CRITICO!! :star:'
-      : criticFail
-      ? ' :skull_crossbones: FALHA CRITICA HAHA!! :skull_crossbones:'
-      : roll.result
-      ? 'Sucesso!'
-      : 'Falha!';
-
-    const rollField: EmbedField = {
-      name: 'Rolagem',
-      value: `${roll.leftTotal}`,
-      inline: true,
-    };
-
-    const habilityField: EmbedField = {
-      name: 'Nível de Habilidade',
-      value: `${roll.rightTotal}`,
-      inline: true,
-    };
-    const totalField: EmbedField = {
-      name: `Margem: ${margin}`,
-      value: `${roll.rightTotal}-${roll.leftTotal} = ${margin}`,
-      inline: false,
-    };
-
-    const embed = new MessageEmbed({
-      color,
-      description: `${roll.leftDiceExpr} ${roll.operator} ${roll.rightDiceExpr}`,
-      title,
-      fields: [rollField, habilityField, totalField],
-    });
-    const messageContent = {
-      content: `${author}`,
-      embeds: [embed],
-    };
-    message
-      ? await message.edit(messageContent)
-      : await channel.send(messageContent);
+      {
+        character,
+      },
+    );
+    const roll = new WandRoll(treatedExpression, originalExpression);
+    return roll;
   }
-  @OnEvent('wand-dice:rolled')
-  async onWandRoll(ctx: RollOptions) {
+  @OnEvent(Event.WAND_DICE_ROLLED)
+  async onWandRoll({
+    args,
+    character,
+    channel,
+    author,
+  }: Payload[Event.WAND_DICE_ROLLED]) {
+    let message: Message;
     try {
-      await this.wandRoll(ctx);
+      const roll = await this.wandRoll(args, {
+        character,
+      });
+      const embeds = roll.toDiscordEmbeds();
+      message = await channel.send({
+        content: `${author}`,
+        embeds,
+      });
     } catch (error) {
-      await onMessageErrorHandler(ctx.message, error, ctx.channel);
+      const ctx: DiscordCrudContext = {
+        author,
+        responseChannel: channel,
+      };
+      await onMessageErrorHandler(message, error, channel);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TextChannel, User } from 'discord.js';
 import { DicesDiscordService } from '~/dices/discord/dices-discord.service';
@@ -7,6 +7,7 @@ import { onMessageErrorHandler } from '~/discord/discord.utils';
 import { CharacterDiscordService } from '~/users/character-discord/character.discord.service';
 import { toUniqueString } from '~/utils';
 import { BaseCrudContext } from '~/utils/crud';
+import { AppEventEmitter, Event } from '~/utils/events';
 import { TechniqueDiscordService } from './technique.discord.service';
 
 @DiscordController({
@@ -18,7 +19,8 @@ export class TechniqueDiscordController {
     private readonly service: TechniqueDiscordService,
     private readonly characterService: CharacterDiscordService,
     private readonly dicesSerivce: DicesDiscordService,
-    private readonly event: EventEmitter2,
+    @Inject(EventEmitter2)
+    private readonly event: AppEventEmitter,
   ) {}
 
   @Command({
@@ -71,7 +73,7 @@ export class TechniqueDiscordController {
         id: 2,
       });
       await this.characterService.getAttributes(character);
-      this.event.emit('wand-dice:rolled', {
+      this.event.emit(Event.WAND_DICE_ROLLED, {
         args: effect.nh.split(' '),
         author,
         channel,

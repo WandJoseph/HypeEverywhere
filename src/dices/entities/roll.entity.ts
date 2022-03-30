@@ -1,4 +1,4 @@
-import { CDN } from '@discordjs/rest';
+import { ColorResolvable, MessageEmbed } from 'discord.js';
 import { evaluate } from 'mathjs';
 import { Dice } from './dice.entitiy';
 
@@ -87,5 +87,24 @@ export class Roll {
     this.leftTotal = this.getTotal(this.leftValues);
     this.rightTotal = this.getTotal(this.rightValues);
     this.defineResult();
+  }
+
+  toDiscordEmbeds() {
+    const color: ColorResolvable = '#ffffff';
+
+    const embed = new MessageEmbed({
+      color,
+      title: `${this.originalExpr} = ${
+        this.total || this.total === 0
+          ? this.total
+          : this.result
+          ? 'Sucesso'
+          : 'Falha'
+      }`,
+      description: `${this.leftDiceExpr} ${
+        this.operator ? this.operator + ' ' : ''
+      }${this.rightDiceExpr || ''}`,
+    });
+    return [embed];
   }
 }

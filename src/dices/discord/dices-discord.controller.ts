@@ -1,11 +1,5 @@
 import { Controller } from '@nestjs/common';
-import {
-  ColorResolvable,
-  EmbedField,
-  MessageEmbed,
-  TextChannel,
-  User,
-} from 'discord.js';
+import { TextChannel, User } from 'discord.js';
 import { DiscordController } from '~/discord';
 import {
   Args,
@@ -31,30 +25,11 @@ export class DicesDiscordController {
     @Args() args: string[],
   ) {
     const msg = await channel.send('Rolling a dice...');
-    const roll = this.service.roll({
-      author,
-      message: msg,
-      args,
-      channel,
-    });
-    const color: ColorResolvable = '#ffffff';
-
-    const embed = new MessageEmbed({
-      color,
-      title: `${roll.originalExpr} = ${
-        roll.total || roll.total === 0
-          ? roll.total
-          : roll.result
-          ? 'Sucesso'
-          : 'Falha'
-      }`,
-      description: `${roll.leftDiceExpr} ${
-        roll.operator ? roll.operator + ' ' : ''
-      }${roll.rightDiceExpr || ''}`,
-    });
+    const roll = await this.service.roll(args);
+    const embeds = roll.toDiscordEmbeds();
     await msg.edit({
       content: `${author}`,
-      embeds: [embed],
+      embeds,
     });
   }
   @Command({
@@ -67,7 +42,12 @@ export class DicesDiscordController {
     @Channel() channel: TextChannel,
     @Args() args: string[],
   ) {
-    const message = await channel.send('Rolling a dice...');
-    await this.service.wandRoll({ author, message, args, channel });
+    const msg = await channel.send('Rolling a dice...');
+    const roll = await this.service.wandRoll(args);
+    const embeds = roll.toDiscordEmbeds();
+    await msg.edit({
+      content: `${author}`,
+      embeds,
+    });
   }
 }
