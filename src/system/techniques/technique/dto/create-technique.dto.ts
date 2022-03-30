@@ -1,8 +1,7 @@
 import { IsEnum, IsString } from 'class-validator';
 import { IsNotRequired } from '~/utils/validator/swagger-decorators/is-not-required.decorator';
 import { IsRequired } from '~/utils/validator/swagger-decorators/is-required.decorator';
-import { TechniqueProficiency } from '../entities/technique.entity';
-
+import { Proficiency } from '../utils/technique.utils';
 export class CreateTechniqueDto {
   @IsRequired()
   @IsString()
@@ -13,6 +12,6 @@ export class CreateTechniqueDto {
   description: string;
 
   @IsNotRequired()
-  @IsEnum(TechniqueProficiency)
-  proficiencyLimit: TechniqueProficiency;
+  @IsEnum(Proficiency)
+  proficiencyLimit: Proficiency;
 }

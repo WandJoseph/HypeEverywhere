@@ -77,7 +77,8 @@ export class TechniqueDiscordController {
         args: effect.nh.split(' '),
         author,
         channel,
-        character,
+        characterAttributes: character.attributes,
+        technique,
       });
       collector.stop();
     });

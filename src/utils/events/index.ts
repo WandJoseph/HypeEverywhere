@@ -1,5 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TextChannel, User } from 'discord.js';
+import { Technique } from '~/system/techniques/technique/entities/technique.entity';
+import { CharacterAttribute } from '~/users/character-attribute/entities/character-attribute.entity';
 import { Character } from '~/users/character/entities/character.entity';
 
 export enum Event {
@@ -11,7 +13,8 @@ export interface Payload {
     args: string[];
     channel: TextChannel;
     author: User;
-    character?: Character;
+    characterAttributes?: CharacterAttribute[];
+    technique: Technique;
   };
 }
 

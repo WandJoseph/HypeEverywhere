@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { APIEmbedField } from 'discord-api-types';
 import { MessageEmbed } from 'discord.js';
 import {
   Column,
@@ -10,39 +9,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Effect } from '../../technique-effect/entities/effect.entity';
+import { TechniquePortuguese } from '../utils/languages/technique.portuguese';
+import { Difficulty, Proficiency } from '../utils/technique.utils';
 
 // Improvisation / Beginner / Skillful / Graduate / Master
-export enum TechniqueProficiency {
-  Improvisation = 'improvisation',
-  Beginner = 'beginner',
-  Skillful = 'skillful',
-  Graduate = 'graduate',
-  Master = 'master',
-  Special = 'special',
-}
-export enum TechniqueDifficulty {
-  Easy = 'easy',
-  Normal = 'normal',
-  Medium = 'medium',
-  Difficult = 'difficult',
-  Special = 'special',
-}
-
-const portugueseProficiency = {
-  improvisation: 'Improvisação',
-  beginner: 'Iniciante',
-  skillful: 'Hábil',
-  graduate: 'Graduado',
-  master: 'Mestre',
-  special: 'Especial',
-};
-const portugueseDifficulty = {
-  easy: 'Fácil',
-  normal: 'Normal',
-  medium: 'Médio',
-  difficult: 'Difícil',
-  special: 'Especial',
-};
 
 @Entity()
 export class Technique {
@@ -66,16 +36,16 @@ export class Technique {
   description: string;
 
   @Column({
-    default: TechniqueProficiency.Master,
+    default: Proficiency.MASTER,
   })
   @ApiProperty()
-  proficiencyLimit: TechniqueProficiency;
+  proficiencyLimit: Proficiency;
 
   @Column({
-    default: TechniqueDifficulty.Medium,
+    default: Difficulty.MEDIUM,
   })
   @ApiProperty()
-  difficulty: TechniqueDifficulty;
+  difficulty: Difficulty;
 
   // acessibility
   // cost
@@ -105,7 +75,7 @@ export class Technique {
         {
           name: 'Proficiência Máxima',
           inline: true,
-          value: portugueseProficiency[this.proficiencyLimit],
+          value: TechniquePortuguese.proficiency[this.proficiencyLimit],
         },
         {
           name: 'Categorias',
@@ -115,7 +85,7 @@ export class Technique {
         {
           name: 'Dificuldade',
           inline: true,
-          value: portugueseDifficulty[this.difficulty],
+          value: TechniquePortuguese.difficulty[this.difficulty],
         },
       ],
     });
