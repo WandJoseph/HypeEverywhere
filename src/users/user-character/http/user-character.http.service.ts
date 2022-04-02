@@ -37,10 +37,4 @@ export class UserCharacterHttpService
     const userId = ctx?.params?.userId;
     ctx.dto.ownerId = userId;
   }
-  @After('create')
-  async emitEvent(ctx: BaseCrudContext) {
-    this.eventEmitter.emit(Event.CHARACTER_CREATED, {
-      character: ctx.entity,
-    });
-  }
 }

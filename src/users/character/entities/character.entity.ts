@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MessageEmbed } from 'discord.js';
+import { EmbedField, MessageEmbed } from 'discord.js';
 import {
   Column,
   CreateDateColumn,
@@ -13,11 +13,11 @@ import { CharacterAttribute } from '~/users/character-attribute/entities/charact
 import { CharacterTechnique } from '~/users/character-technique/entities/character-technique.entity';
 
 export enum Element {
-  Fire = 'fire',
-  Water = 'water',
-  Earth = 'earth',
-  Air = 'air',
-  Lightning = 'lightning',
+  FIRE = 'fire',
+  WATER = 'water',
+  EARTH = 'earth',
+  AIR = 'air',
+  LIGHTNING = 'lightning',
 }
 
 @Entity()
@@ -32,6 +32,14 @@ export class Character {
   @ApiProperty()
   @Column({ nullable: true })
   name: string;
+
+  @ApiProperty()
+  @Column('text', { nullable: true })
+  avatar: string;
+
+  @ApiProperty()
+  @Column('text', { nullable: true, array: true })
+  images: string[];
 
   @ApiProperty()
   @Column('text', { nullable: true })
@@ -66,12 +74,14 @@ export class Character {
   updatedAt: Date;
 
   toDiscordEmbeds(): MessageEmbed[] {
+    const fields: EmbedField[] = [];
     const embed = new MessageEmbed({
       title: `ID: ${this.id}, ` + (this.name || 'Não Cadastrado'),
       description: `${this.quote ? `${this.quote}' ~ *${this.name}*` : ''}
      ${this.nationality ? `Nacionalidade: ${this.nationality}` : ''}
      ${this.element ? `Elemento: ${this.element}` : ''}`,
     });
+    this.avatar && embed.setImage(this.avatar);
     this.personality && embed.addField('Personalidade', this.personality);
     if (this.attributes) {
       const attributes = this.attributes

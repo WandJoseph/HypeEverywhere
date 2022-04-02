@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MessageEmbed } from 'discord.js';
+import { EmbedField, MessageEmbed } from 'discord.js';
 import {
   Column,
   CreateDateColumn,
@@ -62,34 +62,30 @@ export class Technique {
   effects?: Effect[];
 
   toDiscordEmbeds() {
-    const effects: MessageEmbed[] = this.effects.map((effect) => {
-      const embed = effect.toDiscordEmbeds()[0];
-      embed.setTitle(embed.title + ' (Efeito)');
-      embed.setColor('#d07fff');
-      return embed;
-    });
+    const effects: MessageEmbed[] = this.effects
+      ? this.effects.map((effect) => {
+          const embed = effect.toDiscordEmbeds()[0];
+          embed.setTitle(embed.title + ' (Efeito)');
+          embed.setColor('#d07fff');
+          return embed;
+        })
+      : [];
     const embed = new MessageEmbed({
-      title: `${this.name} `,
+      title: `${this.name}`,
       description: this.description,
-      fields: [
-        {
-          name: 'Proficiência Máxima',
-          inline: true,
-          value: TechniquePortuguese.proficiency[this.proficiencyLimit],
-        },
-        {
-          name: 'Categorias',
-          inline: true,
-          value: this.categories?.join(', ') || 'Sem Categorias',
-        },
-        {
-          name: 'Dificuldade',
-          inline: true,
-          value: TechniquePortuguese.difficulty[this.difficulty],
-        },
-      ],
     });
+    this.proficiencyLimit &&
+      embed.addField(
+        'Nível de Proficiência Máximo',
+        this.proficiencyLimit,
+        true,
+      );
+    this.difficulty && embed.addField('Dificuldade', this.difficulty, true);
+    this.categories &&
+      embed.setFooter({
+        text: `Categorias: ${this.categories.join(', ')}`,
+      });
 
-    return [embed, ...effects];
+    return [embed];
   }
 }

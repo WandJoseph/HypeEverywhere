@@ -1,5 +1,6 @@
 import { Controller, Body, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateCharacterDto } from '~/users/character/dto/update-character.dto';
 import { Character } from '~/users/character/entities/character.entity';
 import {
   NestedInUserParams,
@@ -34,20 +35,20 @@ export class UserCharacterHttpController {
   //   return await this.service.create(ctx);
   // }
 
-  // @UpdateRoute({
-  //   type: Character,
-  // })
-  // update(
-  //   @Param() params: NestedInUserFindOneParams,
-  //   @Body() dto: UpdateUserCharacterDto,
-  // ) {
-  //   const ctx: BaseCrudContext = {
-  //     id: params.id,
-  //     params,
-  //     dto,
-  //   };
-  //   return this.service.update(ctx);
-  // }
+  @UpdateRoute({
+    type: Character,
+  })
+  update(
+    @Param() params: NestedInUserFindOneParams,
+    @Body() dto: UpdateCharacterDto,
+  ) {
+    const ctx: BaseCrudContext = {
+      id: params.id,
+      params,
+      dto,
+    };
+    return this.service.update(ctx);
+  }
 
   @DeleteRoute({
     type: Character,

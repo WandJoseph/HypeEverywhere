@@ -1,7 +1,7 @@
 import { OmitType } from '@nestjs/mapped-types';
 import { PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDate, IsEnum, IsString } from 'class-validator';
+import { IsArray, IsDate, IsEnum, IsString, IsUrl } from 'class-validator';
 import { IsNotRequired } from '~/utils/validator/swagger-decorators/is-not-required.decorator';
 import { CreateCharacterDto } from './create-character.dto';
 import { Element } from '../entities/character.entity';
@@ -10,6 +10,18 @@ export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
   @IsNotRequired()
   @IsString()
   name: string;
+
+  @IsNotRequired()
+  @IsString()
+  avatar: string;
+
+  @IsNotRequired()
+  @IsString({
+    each: true,
+  })
+  @IsUrl()
+  @IsArray()
+  images: string[];
 
   @IsNotRequired()
   @IsString()
@@ -33,7 +45,10 @@ export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
   element: Element;
 
   @IsNotRequired()
-  @IsString()
+  @IsArray()
+  @IsString({
+    each: true,
+  })
   languages: string[];
 
   @IsNotRequired()

@@ -9,6 +9,8 @@ export class CreateCharacterTechniqueDto {
   techniqueId: number;
 
   @IsEnum(Proficiency)
-  @IsNotRequired()
-  proficiency: number;
+  @IsNotRequired({
+    enum: Proficiency,
+  })
+  proficiency: Proficiency;
 }

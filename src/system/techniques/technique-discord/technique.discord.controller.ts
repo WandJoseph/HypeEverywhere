@@ -34,11 +34,12 @@ export class TechniqueDiscordController {
   ) {
     const name = args.join(' ');
     const uniqueName = toUniqueString(name);
+    const id = args.join(' ');
 
     const msg = await channel.send(`Buscando a Técnica '${name}'`);
     const ctx: BaseCrudContext = {
       options: {
-        where: [{ uniqueName }],
+        where: [{ uniqueName }, { id }],
       },
     };
     const technique = await this.service.findOneOrFail(
@@ -49,9 +50,15 @@ export class TechniqueDiscordController {
     await this.service.getEffects(technique);
     const embeds = technique.toDiscordEmbeds();
     const { actionRow, keys } = this.service.getEffectsActions(technique);
+    if (actionRow.components.length === 0) {
+      return await msg.edit({
+        content: `${author}`,
+        embeds,
+      });
+    }
     await msg.edit({
       content: `${author}`,
-      embeds: [...embeds],
+      embeds,
       components: [actionRow],
     });
     const collector = msg.createMessageComponentCollector({
